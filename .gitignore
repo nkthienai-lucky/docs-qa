@@ -13,3 +13,4 @@ eval/cache/
 logs/
 results/raw/
 *.sqlite3
+.worktrees/
