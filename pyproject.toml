@@ -17,6 +17,9 @@ dependencies = [
   "transformers==5.17.0",
 ]
 
+[project.scripts]
+docsqa-ui = "docsqa.ui:serve_ui"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
