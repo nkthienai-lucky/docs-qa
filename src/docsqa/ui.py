@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from html import escape
 import http.client
 import json
 import os
-from pathlib import Path
 import secrets
+from html import escape
+from pathlib import Path
 from typing import Any, Protocol
 from urllib import error as urllib_error
 from urllib import parse as urllib_parse
@@ -114,7 +114,7 @@ def _make_ask_ui_handler(client: object):
                     else "Answer ready."
                 ),
             )
-        except Exception as error:
+        except (ValueError, RuntimeError, OSError, http.client.HTTPException, urllib_error.URLError) as error:
             return (
                 "",
                 gr.update(choices=[], value=None),
@@ -196,7 +196,7 @@ class _UrllibTransport:
             f"--{boundary}\r\n"
             f'Content-Disposition: form-data; name="file"; filename="{Path(filename).name}"\r\n'
             f"Content-Type: {content_type}\r\n\r\n"
-        ).encode("utf-8")
+        ).encode()
         suffix = f"\r\n--{boundary}--\r\n".encode("ascii")
         file_size = file_obj.seek(0, 2)
         file_obj.seek(0)
@@ -294,7 +294,7 @@ def _make_ask_handler(client: object):
                     else "Answer ready."
                 ),
             )
-        except Exception as error:
+        except (ValueError, RuntimeError, OSError, http.client.HTTPException, urllib_error.URLError) as error:
             return "", "No citations available.", f"Unable to get an answer: {_safe_error(error)}"
 
     return handle_ask
@@ -349,7 +349,7 @@ def build_ui(api_base: str, client: object | None = None) -> gr.Blocks:
         config = gr.Dropdown(
             label="Retrieval strategy",
             choices=_RETRIEVAL_CONFIGS,
-            value="v1",
+            value="v2a",
             info=(
                 "Dense search finds semantically similar passages. Hybrid adds keyword search; "
                 "reranking reorders candidates for relevance."
@@ -396,7 +396,7 @@ def build_ui(api_base: str, client: object | None = None) -> gr.Blocks:
                     if found
                     else "No indexed documents yet. Upload a PDF to get started."
                 )
-            except Exception as error:
+            except (ValueError, RuntimeError, OSError, http.client.HTTPException, urllib_error.URLError) as error:
                 return gr.update(choices=[], value=[]), (
                     f"Could not load documents: {_safe_error(error)}"
                 )
@@ -418,7 +418,7 @@ def build_ui(api_base: str, client: object | None = None) -> gr.Blocks:
                         f"Uploaded {source}, but the document list did not refresh.",
                     )
                 return "", group, list_status, f"Uploaded and indexed {source}."
-            except Exception as error:
+            except (ValueError, RuntimeError, OSError, http.client.HTTPException, urllib_error.URLError) as error:
                 return "", gr.update(), "", f"Upload failed: {_safe_error(error)}"
 
         def show_selected_citation(

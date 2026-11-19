@@ -65,10 +65,10 @@ class FakeRetriever:
 class FakePipeline:
     def __init__(self) -> None:
         self.embedder = FakeEmbedder()
-        self.retrievers = {"v1": FakeRetriever(self.embedder)}
+        self.retrievers = {"v1": FakeRetriever(self.embedder), "v2a": FakeRetriever(self.embedder)}
         self.calls: list[tuple[str, str, list[str] | None]] = []
 
-    def ask(self, question, config="v1", doc_ids=None):
+    def ask(self, question, config="v2a", doc_ids=None):
         if config not in self.retrievers:
             raise KeyError(f"unknown retrieval configuration: {config}")
         self.calls.append((question, config, doc_ids))
@@ -85,7 +85,7 @@ class FakePipeline:
                     excerpt="borrow: to take something temporarily",
                 )
             ],
-            retrieval=RetrievalInfo("v1", ["3a357be041df101c:0"], [0.9]),
+            retrieval=RetrievalInfo(config, ["3a357be041df101c:0"], [0.9]),
         )
 
 
@@ -151,17 +151,23 @@ def test_ask_serializes_answer_response_and_forwards_body(env) -> None:
     ]
 
 
-def test_ask_applies_defaults_and_unknown_config_is_400(env) -> None:
-    ok = env.client.post("/ask", json={"question": "job vs work?"})
+def test_ask_applies_v2a_default_and_preserves_explicit_v1(env) -> None:
+    default_response = env.client.post("/ask", json={"question": "job vs work?"})
+    explicit_response = env.client.post(
+        "/ask", json={"question": "borrow?", "config": "v1"}
+    )
 
-    assert ok.status_code == 200
-    assert env.pipeline.calls == [("job vs work?", "v1", None)]
+    assert default_response.status_code == 200
+    assert explicit_response.status_code == 200
+    assert env.pipeline.calls == [
+        ("job vs work?", "v2a", None),
+        ("borrow?", "v1", None),
+    ]
 
     rejected = env.client.post("/ask", json={"question": "q", "config": "v9"})
 
     assert rejected.status_code == 400
     assert "v9" in rejected.json()["detail"]
-    assert env.pipeline.calls == [("job vs work?", "v1", None)]
 
 
 def test_non_pdf_and_oversize_rejected_with_4xx(

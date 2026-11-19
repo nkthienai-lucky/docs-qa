@@ -221,6 +221,7 @@ def test_retrieval_options_explain_modes_and_keep_api_values() -> None:
         if component.get("props", {}).get("label") == "Retrieval strategy"
     )
 
+    assert dropdown["props"]["value"] == "v2a"
     assert [tuple(choice) for choice in dropdown["props"]["choices"]] == [
         ("V1 · Dense vector search", "v1"),
         ("V2a · Dense search + reranking", "v2a"),

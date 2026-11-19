@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -33,7 +33,7 @@ PARSE_TIMEOUT_S = 900
 
 class AskRequest(BaseModel):
     question: str
-    config: str = "v1"
+    config: str = "v2a"
     doc_ids: list[str] | None = None
 
 
@@ -147,14 +147,16 @@ def serve() -> None:
     embedder.embed_documents(["probe text"])
     store = VectorStore(
         settings.database_url,
-        EmbedderMeta(
-            model=embedder.model, backend=embedder.backend, dim=embedder.dim
-        ),
+        EmbedderMeta(model=embedder.model, backend=embedder.backend, dim=embedder.dim),
     )
     store.ensure_schema()
     vector = VectorRetriever(store, embedder, top_k=50)
     bm25 = BM25Index.from_store(store)
-    reranker = Reranker(settings.reranker_model, device="cpu")
+    reranker = Reranker(
+        settings.reranker_model,
+        device=settings.reranker_device,
+        batch_size=settings.reranker_batch_size,
+    )
     retrievers = {
         "v1": VectorRetriever(store, embedder, top_k=5),
         "v2a": RerankRetriever(vector, reranker, candidates=50, top_k=5),
@@ -171,7 +173,9 @@ def serve() -> None:
             host=settings.ollama_host,
             model=settings.generator_model,
             num_ctx=settings.num_ctx,
+            num_predict=settings.generator_num_predict,
         ),
         final_k=5,
+        generation_k=settings.generation_k,
     )
     uvicorn.run(create_app(pipeline, store, Path("data/uploads")), host=HOST, port=8000)
