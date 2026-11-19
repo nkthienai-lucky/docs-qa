@@ -5,7 +5,6 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
-
 _WHITESPACE = re.compile(r"\s+")
 _SYLLABLE = re.compile(r"^[A-Za-zÀ-ỹĐđ]+$")
 

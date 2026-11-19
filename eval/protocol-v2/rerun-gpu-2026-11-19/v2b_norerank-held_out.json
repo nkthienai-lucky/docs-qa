@@ -1,0 +1,806 @@
+[
+  {
+    "question": {
+      "id": "q45",
+      "text": "What is one example of a word with the suffix -ment in the passage?",
+      "ground_truth": "“Improvement” is given as an example of a word ending in -ment.",
+      "category": "fact",
+      "gold_pages": [
+        15
+      ],
+      "gold_spans": [
+        "improvement"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "One example of a word with the suffix **-ment** in the passage is **management**.",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:107",
+      "3a357be041df101c:9",
+      "3a357be041df101c:109",
+      "3a357be041df101c:108",
+      "3a357be041df101c:8"
+    ],
+    "retrieval_scores": [
+      0.03252247488101534,
+      0.032266458495966696,
+      0.031054405392392875,
+      0.029857397504456328,
+      0.02607709750566893
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.6,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "gives more attention to Sarah than she does to Lucas. B: Yes, it's very on poor Lucas. 70.4 These words all appear in other units of the book. Do you know how to form the opposites? pleasant kind fashionable reliable patient (adj) friendly suitable tidy like (v) ability do up sociable unpleasant 71 Suffixes: forming nouns A Verb + noun suffix Suffixes are used at the ends of words; they often tell you if a word is a noun, a verb, an adjective or an adverb. Two suffixes which form nouns from verbs are -ion and -ment. His latest invention is a new board game. Relaxationwill help you to sleep better. Themanagement has to change. I need money for more development. We had a discussion about politics. We need an improvement in the weather. B Adjective + noun suffix The suffixes -ness and -ity often form nouns from adjectives. What is his mainweakness as a manager? Snowboarding is growing in popularity. I'm frustrated by my inability to use computers. Fortunately it wasn't a serious illness. There is a similarity between them. Her happiness is all that matters to me. C -er, -or and -ist These suffixes can be added to nouns or verbs. They often describe people and jobs. Language help Adding a suffix to a verb, adjective or noun may change the position of the main stress, e.g. re'lax - relax'ation, 'stupid - stu'pidity, eco'nomics - e'conomist. (The ' symbol is before the syllable with the main stress.) Exercises 71.1 Complete the tables and mark the stress on each word. (Stress is marked on the pronunciation of a word in a dictionary.) The last two in each column are not on the opposite page, but do you know or can you guess the noun formed from them? 71.2 Write down the names of the people who do these things as a job. 1 sing opera music opera singers 2 act in films 3 important managers in a company 4 change words from one language into another 5 play football 6 dance in ballets 7 paint pictures 8 work in science 71.3 Complete the text using words from the box with the correct suffix and spelling. One word also needs a prefix. weak improve govern economics able manage discuss In his speech last night, the prime minister said that the present 1 weakness of the economy was caused by the bad 2 of the last 3 and their 4 to give the right kind of help for industry. He said he was now involved in detailed 5 with ministers, bankers and 6 about a range of different financial measures, and he hoped the people would be able to see a big 7 in the economy by the end of the year. 71.4 Complete the dialogues. 1 A: He hasn't been well at all, has he? B: No, it's quite a serious illness . 2 A: Are they almost the same? B: Yes, the is amazing. 3 A: Has anyone made anything like this before? B: No, it's a brand-new . 4 A:"
+    ]
+  },
+  {
+    "question": {
+      "id": "q04",
+      "text": "In the appearance vocabulary, what does 'broad shoulders' mean?",
+      "ground_truth": "It means wide shoulders; the opposite is narrow.",
+      "category": "fact",
+      "gold_pages": [
+        28
+      ],
+      "gold_spans": [
+        "broad shoulders [wide; opp narrow]"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:15",
+      "3a357be041df101c:16",
+      "3a357be041df101c:131",
+      "3a357be041df101c:196",
+      "3a357be041df101c:47"
+    ],
+    "retrieval_scores": [
+      0.03252247488101534,
+      0.032018442622950824,
+      0.02819138376017471,
+      0.02728937728937729,
+      0.02699859747545582
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 0.5
+    },
+    "contexts": [
+      "body is covered in skin. Too much sun is bad for your skin. B Movements with your mouth, face and head People breathe through their nose or mouth. You breathe in and out about 12-15 times a minute. People smilewhen they're happy, and sometimes smile at people to be polite. People laugh at things which are funny. People sometimes cry if they're very unhappy, or receive bad news. People in some countries nod their head [move it up and down] to mean 'yes', and shake their head [move it from side to side] for 'no'. People often yawnwhen they're tired, and sometimes when they're bored. C Common expressions shake hands with someone fold your arms comb your hair wave to somebody blow your nose Exercises 9.1 Find ten more words for parts of the body, either across or down. 9.2 Match the words on the left with the words on the right. 1 shake e 2 wave 3 comb 4 fold 5 blow 6 nod 9.3 Label the picture. 9.4 What do these actions often mean? (There may be several possible answers.) 1 People often smile when they're happy. 2 They often breathe quickly after 3 They laugh 4 They may wave to somebody 5 They blow their nose 6 They shake their head 7 And nod their head 8 They cry 9 They yawn a your hair b your nose c to somebody d your head e hands f your arms A Describing beauty Your appearance is the way you look, and we sometimes use different words to talk about beauty in men and women. WOMEN can be attractive or good-looking [nice to look at], and we often use pretty [attractive] to describe a girl. We use beautiful or gorgeous for women who are very attractive. MEN can be attractive and good-looking, but also handsome. If men are very attractive, we can say they are gorgeous or very good-looking, but not usually beautiful. Liam has become quite handsome. Olivia was very prettywhen she was younger. Bella looks gorgeous in that dress. They're a very good-looking couple. Language help The opposite of beautiful is ugly, but it is not very polite to describe someone as ugly; ordinary [not special or different] is more polite. It also isn't polite to say that someone is fat; overweight is more polite. B Size We can talk about a person's height [how tall or short they are] and their weight [how heavy they are], e.g. I'mroughly [about; syn approximately] one metre eighty (tall), and I weigh just under eighty kilograms. If someone is not tall or short, you can describe them asmedium height. If a person is very similar to most other people in height and weight, you can say they are average. A: How tall is Hannah? A: Is Marco quite big? B: Medium height, I'd say. B: No, about average. C Hair blonde (or blond) straight fair brown dark black wavy curly D Talking about someone's appearance A: What does Sophia's boyfriend look like? [Can you describe his appearance?] B: He's blond, and quite"
+    ]
+  },
+  {
+    "question": {
+      "id": "q06",
+      "text": "What is a honeymoon?",
+      "ground_truth": "It is a holiday taken just after getting married.",
+      "category": "fact",
+      "gold_pages": [
+        37
+      ],
+      "gold_spans": [
+        "A holiday just after getting married"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:76",
+      "3a357be041df101c:77",
+      "3a357be041df101c:105",
+      "3a357be041df101c:69",
+      "3a357be041df101c:26"
+    ],
+    "retrieval_scores": [
+      0.025478740668614087,
+      0.025326537113730486,
+      0.022574508560558024,
+      0.021805752003771807,
+      0.021718931475029037
+    ],
+    "retrieval": {
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "reciprocal_rank": 0.0
+    },
+    "contexts": [
+      "keeps me awake at night. 5 We've got three kinds of : strawberry, vanilla and chocolate. 6 I like that new fruit with oranges and mangoes. 7 Kate can't have the chicken panini. She only eats food. 49.3 Match the sentence beginnings on the left with the best endings on the right. 1 What size: b 2 Is it to have in a heated up? b regular or large? 3 Would you like it 4 What's in c that baguette? d the napkins? e or to take away? 5 Where are 49.4 Choose the correct word to complete the dialogue. A: Would you like a hot drink? B: Yes, two 1 milkshakes / cappuccinos, please. A: What size? B: 2 Large / Herbal, please. A: Anything to eat? B: Yes. What's in that 3 panini / cupcake? A: Italian cheese and mushrooms. I can heat it up for you. B: OK, yes. I'll have that. And a chocolate 4 muffin / bagel. A: To eat in? B: No, to 5 heat it up / take away. 49.5 Over to you Answer the questions. If possible, ask someone else the same questions. 1Where do you usually have lunch during the week? What about at the weekend? 2What kind of food and drink do you usually order in a café? 3What type of food and drink from A and B do you like? A Things to see fountain mosque B Tourist activities C Describing places The word place can describe a building, an area, a town, or country, e.g. Bruges is a lovely place [town] and we found a really nice place [hotel] to stay. The guidebooks [books with information about places] say the Alhambra in Granada ismagnificent [very good or very beautiful], but it's always packed [very crowded] with tourists in the summer. São Paulo is a lively place [full of life and activity], and there's plenty [a lot] to do in the evening. St Petersburg has lots of historic monuments [important places built a long time ago] but the Hermitage Museum was the main attraction for me. [something that makes people come to a place or want to do a particular thing] If you go to Poland, it's definitely worth visiting Kraków. Language help We useworth + noun/-ing to say that it is a good idea to do something or go somewhere. It'sworth hiring a car if you go to Scotland. Glasgow isworth a visit as well. cathedral market castle temple statue Exercises 50.1 Tick (✓) the words which refer to religious places. 50.2 Complete the email. 50.3 Complete the dialogues, but without using a word from the question. 1 A: It's a fabulous city, isn't it? B: Yes, it's a wonderful place . 2 A: It was very crowded, wasn't it? B: Yes, it was absolutely . 3 A: It's lively in the evening, isn't it? B: Yes, there's . 4 A: Did you enjoy yourselves? B: Yes, we had a . 5 A: Kyoto is a good place to go to, isn't it? B: Yes, Kyoto is definitely . 6"
+    ]
+  },
+  {
+    "question": {
+      "id": "q08",
+      "text": "How does the book distinguish 'disease' from 'illness'?",
+      "ground_truth": "Disease is used for more serious problems, often affecting body parts; illness can refer to serious or minor problems and those affecting the mind.",
+      "category": "reasoning",
+      "gold_pages": [
+        47
+      ],
+      "gold_spans": [
+        "Disease is used to talk about more serious medical problems, often affecting certain parts of the body. Illness is used to talk about serious and minor medical problems and those affecting the mind"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "According to the text, the distinction is made as follows:\n\n*   **Disease** is used to talk about more serious medical problems, often affecting certain parts of the body (e.g., heart disease).\n*   **Illness** is used to talk about both serious and minor medical problems and those affecting the mind (e.g., mental illness).\n\nAdditionally, the text notes that \"disease\" is not used when referring to a period of illness (e.g., one would say \"a long illness,\" not \"a long disease\").",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:32",
+      "3a357be041df101c:202",
+      "3a357be041df101c:132",
+      "3a357be041df101c:59",
+      "3a357be041df101c:47"
+    ],
+    "retrieval_scores": [
+      0.02738245361196181,
+      0.026736111111111113,
+      0.026500526500526502,
+      0.025516795865633074,
+      0.024325827078120657
+    ],
+    "retrieval": {
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "body for medical reasons; also called surgery]. Lung cancer can be caused by smoking. Heart attacks can happen very suddenly. Hepatitis is a disease affecting the liver. Language help Disease is used to talk about more serious medical problems, often affecting certain parts of the body, e.g. heart disease. Illness is used to talk about serious and minor medical problems and those affecting the mind, e.g. mental illness. Disease is not used about a period of illness, e.g. He died after a long illness. (NOT He died after a long disease.) Exercises 20.1 Look at the underlined letters in each pair of words. Is the pronunciation the same or different? Use the index to help you. 1 ache pain same 2 cold stomach different -. 3 cough through 4 flu cut 5 liver disease 6 stomach operation 7 chemist ache 8 patient bandage 20.2 Complete the sentences with a or nothing (-). 1 She's got hepatitis. - 2 I've got cough. a 3 I'm getting sore throat. 4 Ben's got headache. 5 Luis's got temperature. 20.3 Complete the dialogues. 1 A: Does your finger hurt? B: Yes, it's very painful . 2 A: What's wrong with Dimitrios? B: He feels . I think it's something he ate. 3 A: Did you hit your foot? B: Yes, and it really . 4 A: My hand's bleeding quite badly. B: Well, put a round it. 5 A: Your finger's . B: I know. I cut it using that knife. 6 A: Does Tanya still from bad headaches? B: Yes, she gets them all the time. 7 A: What's the matter? B: My back from sitting at that computer all day. 8 A: I understand Lena has had quite a illness. B: Yeah. She was in hospital for over a week. 20.4 Find five more pairs of words. Why are they pairs? lung heart surgeon tablets/pills attack liver operation cancer hepatitis sore medicine throat lung and cancer - because you can get lung cancer. 6 I've got backache. 7 Zarita's got flu. 8 My uncle had heart attack. 9 She's got cancer. 10 I've got pain in my foot. 20.5 Over to you Answer the questions. If possible, compare your answers with someone else. 1What do you usually do if you get a headache? 2How often do you get a cough or a sore throat? 3Have you ever been a patient in hospital? If so, what was it like? 4Have you ever had surgery? 5 Are there some medicines you always keep in your home? What are they? A Smart, stylish and casual I think the woman looks stylish [wearing nice clothes and looking attractive; alsowell- dressed]. The man is smartly dressed [clean and tidy and suitable for formal situations]. The boy's clothes are more casual [comfortable and suitable for informal situations]. B Verbs and phrases used with clothes As soon as I get up, I have a shower and get dressed [put on my clothes]. I don't eat breakfast. I prefer jackets with a zip; it's easier to undo a zip [open a zip,"
+    ]
+  },
+  {
+    "question": {
+      "id": "q10",
+      "text": "Approximately how many lessons are in a school day in the described system?",
+      "ground_truth": "A school day is divided into about five to seven lessons.",
+      "category": "fact",
+      "gold_pages": [
+        70
+      ],
+      "gold_spans": [
+        "The school day is divided into about 5-7 lessons"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "The school day is divided into about 5-7 lessons.",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:48",
+      "3a357be041df101c:49",
+      "3a357be041df101c:92",
+      "3a357be041df101c:46",
+      "3a357be041df101c:47"
+    ],
+    "retrieval_scores": [
+      0.03278688524590164,
+      0.03225806451612903,
+      0.030798389007344232,
+      0.02819138376017471,
+      0.027432808155699723
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.4,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "words? swap places with anyone? share a book with anyone? use a rubber? borrow anything? lend someone a pencil? use a ruler? a DVD A The school system This is the systemfor state education in most parts of England and Wales. State schools are free and operated by the country. Parents pay to send their children to private schools. B The school timetable The school day is divided into about 5-7 lessons, and over the course of a week, most pupils do/study about ten subjects, including English, maths, history, science, etc. There's usually a one-hour lunch break [period of rest between work], and a break in the morning and afternoon as well. Language help In American English the subject ismath, but in British English it ismaths. The school year is usually divided into three terms [periods of study], with each term being about 13 weeks, although some schools are now having shorter terms and more frequent holidays. At the end of the school year, pupils usually take/do exams before they break up [end classes for the term]. After the summer holidays, they go back [return] for the new school year. C School rules* In the past schools generally had more rules, and if you broke the rules 1 , you were punished. At my school, for example, pupils sometimes had to stay behind 2 and write an essay. I used to get into trouble 3 for wearing lipstick. I remember we had to call themale teachers 'sir' and female teachers 'miss', and we had to wear a horrible uniform 4 . Nowadays, the atmosphere 5 is more relaxed 6 : older pupils can often dress 7 the way they want - as long as they're reasonably smart 8 - and the teachers are not as strict 9 . * instructions telling you what you must or must not do 1 did something wrong 2 stay in a place when others leave 3 do something wrong and be punished 4 special clothes 5 the feeling in a place or situation 6 comfortable and informal 7 wear clothes 8 well dressed and not too casual 9 A strict teacher punishes pupils who do something wrong. Exercises 32.1 Match the words on the left with the words on the right. 1 go e 2 leave 3 take 4 wear 5 study 6 stay 7 get 8 break a the rules b a uniform c into trouble d at school e to school f school g an exam h a subject 32.2 Complete the sentences about state schools in England. 1 When they're three, children can go to nursery school. 2 At the age of five they go to school. 3 At the age of eleven they go to school. 4 When they're sixteen they exams, and afterwards they can go to a college for if they want. 5 Many pupils at school for another two years and do 'A' levels. 6 Nowadays, a lot of pupils to university after they leave school. 32.3 Choose the correct word to complete the sentences. Sometimes both are correct."
+    ]
+  },
+  {
+    "question": {
+      "id": "q12",
+      "text": "What does the passage say about Kelly's overtime?",
+      "ground_truth": "Kelly does not have to work overtime.",
+      "category": "fact",
+      "gold_pages": [
+        81
+      ],
+      "gold_spans": [
+        "she doesn't have to 16 overtime"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:55",
+      "3a357be041df101c:196",
+      "3a357be041df101c:118",
+      "3a357be041df101c:54",
+      "3a357be041df101c:59"
+    ],
+    "retrieval_scores": [
+      0.02964254577157803,
+      0.029631255487269532,
+      0.027893738140417457,
+      0.025934278350515462,
+      0.025603392041748205
+    ],
+    "retrieval": {
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "reciprocal_rank": 0.0
+    },
+    "contexts": [
+      "ways: My income is about £25,000. OR I earn/make about £25,000 a year [every year]. Some of that income you can keep, but some goes to the government; in the UK this is called income tax, e.g. I lose 20% of my income in income tax. Language help A salary is money paid to professional people, e.g. doctors or teachers, and to office workers for the work they do, and is usually paid into a person's bank account every month. Wages are usually paid for each hour/day/week of work to people who do more physical jobs, e.g. building or cleaning. D Conditions* Most people work fixed hours [always the same], e.g. 9 am to 5.30 pm. We often call this a nine-to-five job. Other people have to do/work overtime [work extra hours]. Some people get paid for overtime; others don't. Some people have good working conditions, e.g. nice offices, paid holidays, extra time off [not at work] for a new mother and father when a baby is born, etc. There is also aminimum wage [an amount of money workers receive, and employers cannot pay less than this]. * the situation in which people work or live B: I work in sales / marketing / a bank, etc. B: I'm a doctor / hairdresser, etc. B: I work for Union Bank / Fiat / Sony, etc. Exercises 36.1 Tick (✓) the words which are directly connected withmoney. pay ✓ earn salary income handle wages consult product 36.2 Match the words on the left with the words on the right. 1 set up b 2 in charge a clients b a company c overtime 3 deal d with complaints 4 earn e of a small department 5 do 6 advise f money 36.3 Rewrite the sentences on the left starting with the words given. Keep a similar meaning. 1 What do you do? What's your job? 2 I'm a marketing assistant. I work 3 I'm employed by the government. I work 4 I earn £34,000 a year from my two jobs. My 5 What do you have to do exactly? What does your job 6 I'm responsible for the reception area. I'm in 7 What's your job? What do you do for 8 I have to read government reports. My job involves 9 I advise clients. I give 10 I complained about the service. I made 36.4 Complete the texts. Put one word in each gap. Alexander Carpenter works 1 in sales, and he's a regional manager. He 2 the north-west region and he's 3 for a small team of five other sales people. His job 4 a lot of travelling within the region, and he's in contact with his team on a day-to- 5 basis. It's not a nine-to- 6 job: Alexander has to do a lot of 7 . Fortunately he can 8 a lot more money by doing this, and his working 9 are quite good. After income 10 he makes £60,000 11 year. Recently his wife had a baby, but the company gave him extra time 12 to be with"
+    ]
+  },
+  {
+    "question": {
+      "id": "q14",
+      "text": "How often does the example say the person's best friend works out at the gym?",
+      "ground_truth": "The best friend works out in the gym two or three times a week.",
+      "category": "fact",
+      "gold_pages": [
+        90
+      ],
+      "gold_spans": [
+        "She works out in the gym two or three times a week as well."
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:20",
+      "3a357be041df101c:140",
+      "3a357be041df101c:64",
+      "3a357be041df101c:17",
+      "3a357be041df101c:118"
+    ],
+    "retrieval_scores": [
+      0.0315136476426799,
+      0.031099324975891997,
+      0.030886196246139225,
+      0.028850145288501453,
+      0.026973565905412694
+    ],
+    "retrieval": {
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 0.3333333333333333
+    },
+    "contexts": [
+      "brother called Thomas and two younger sisters, Anya and Claudia, who are twins 3 . We're a close family 4 . My mother is an only child 5 , but I've got two uncles on my father's side. One is married with two children, and the other is married with three children, so altogether I have five cousins. I get on well with 6 Uncle Rolf, and he always tells me I'm his favourite nephew. Of his nieces, I think he likes Anya best. Recently my brother Thomas got married. His wife's name is Sabine, so I now have a sister-in-law 7 as well. 4 a family who like each other and stay together a lot 5 without brothers or sisters 6 have a good relationship with 7 (also mother/brother/son-in-law, etc.) Common mistakes It's more common and more natural to say 'Thomas'swife' (NOT the wife of Thomas) or 'Anna's younger sister' (NOT the younger sister of Anna). B Friends FRIENDS My best friend is Florian, an old school friend 1 . We got to know each other 2 when we were in the same class at school. We've beenmates 3 ever since 4 , and our friendship is very important to both of us. He spends a lot of time with my family, and his current 5 girlfriend is actually one of Thomas's ex-girlfriends. But we all get on really well. Language help We use the prefix ex- for a relationship we had in the past but do not have now, e.g. The children stay with my ex- husband at the weekend; I saw an ex- girlfriend of mine yesterday. Exercises 13.1 Look at the family tree, then complete the sentences below. 1 Simon died two years ago, so Cath is a widow . 2 Leyla is Cath's . 3 Tom is Cath's . 4 Cath is Meg's . 5 Simon was Brian's . 6 Tom is Leyla's brother. 7 Emily is Leyla's . 8 Emily is an child. 13.2 Which words are being defined? 1 Your current boyfriend is the one that you have now. 2 means get married again. 3 are all the members of your family. 4 Your friend is the one you like more than any other. 5 An friend is someone you have known for a long time. 6 are two children born to one mother at the same time. 7 is an informal word for a friend. 8 is the noun when two people are friends. 9 Your is the man who is married to your mother but is not your father. 13.3 Complete the text. I was still going out with James when I met my husband, Ben. We 1 got to know each other because we went to the same gym twice a week. We went out with each other for about 18 months, and we got 2 three years ago, so 3 we've been a couple for almost five years. We've continued to go to the gym ever 4 we got married, and I still quite often see James when we're there. It's"
+    ]
+  },
+  {
+    "question": {
+      "id": "q16",
+      "text": "What source phrase does the book recommend when reporting what a newspaper says?",
+      "ground_truth": "It gives 'According to the paper' as a reporting phrase.",
+      "category": "fact",
+      "gold_pages": [
+        111
+      ],
+      "gold_spans": [
+        "According to the paper"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:114",
+      "3a357be041df101c:79",
+      "3a357be041df101c:101",
+      "3a357be041df101c:80",
+      "3a357be041df101c:1"
+    ],
+    "retrieval_scores": [
+      0.031746031746031744,
+      0.0315136476426799,
+      0.029411764705882353,
+      0.029051670471052088,
+      0.028665028665028666
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.6,
+      "reciprocal_rank": 0.5
+    },
+    "contexts": [
+      "two words, usually joined by and, and sometimes or. I go to the theatre now and again [occasionally; syns now and then]. Andy had one or two [a few] suggestions. I've got a house in the country, and I like to go there whenever possible for a bit of peace and quiet [a calm situation without noise]. I've been up and down the street, but I can't find their house. [first in one direction, then the other] I've been to Paris once or twice [a few times]. I'll finish this report sooner or later [I don't know when, but I'll finish it]. D Introducing advice, opinions, etc. Many fixed phrases are used to introduce advice, an opinion, an example, etc. If I were you [in your situation], I'd accept the job they offered you. In general [usually, or in most situations; syn on the whole] the summers are quite warm in this part of the country. There were lots of questions. For instance [for example], how much will it cost? I'm sure you'll have a great holiday. By the way, what time does the train leave? (used to introduce a new subject to the conversation) To be honest, I didn't like her boyfriend very much. (used to say what you really think) Exercises 75.1 Using all the words in the square, find eight more phrases. on and off 75.2 Complete the sentences with one word, then underline the full fixed phrase in each sentence. 1 She's been working on that essay night after night . 2 I'm arranging everything for next week. By the , is your sister coming this evening? 3 My parents always turn up at my flat out of the . 4 Some people enjoyed the book, but to be , I thought it was boring. 5 I'd like to get of these CDs because I don't listen to them any more. 6 In , people are much happier when they have jobs that they enjoy. 7 I don't know what to do at the moment but I'll have to make up my soon. 8 It's a flexible ticket. For , you can use it during the week or at weekends. 9 Can I ring you later? I'm just to have lunch. 10 If I you, I'd get a new dictionary. 75.3 Complete the fixed phrase in each dialogue. 1 A: Do you go there much? 7 A: Have you been there often? B: Now and again . B: Once . 2 A: Have you had any ideas? 8 A: Do you need me there now? B: Yeah. One . B: Yes. Could you come at ? 3 A: Was she very upset? 9 A: When are you going back? B: Yes. She burst . B: In two weeks' . 4 A: You arrived ten days ago? 10 A: How's the course? B: Yeah, the week . B: It's good so . 5 A: Should I accept the job? 11 A: I spoke to Chris Myler. Do you know him? B: Yes, I would if . B: No, the"
+    ]
+  },
+  {
+    "question": {
+      "id": "q18",
+      "text": "In the clothing-material matching exercise, what item is paired with 'silk'?",
+      "ground_truth": "The exercise pairs silk with a scarf.",
+      "category": "rare_keyword",
+      "gold_pages": [
+        133
+      ],
+      "gold_spans": [
+        "a silk 2 a rubber 3 a fur 4 a cotton 5 a leather b hat c belt d toy e tyre f T-shirt"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:35",
+      "3a357be041df101c:47",
+      "3a357be041df101c:76",
+      "3a357be041df101c:75",
+      "3a357be041df101c:149"
+    ],
+    "retrieval_scores": [
+      0.03057889822595705,
+      0.026387470207694927,
+      0.025679012345679014,
+      0.023088023088023088,
+      0.020141700404858298
+    ],
+    "retrieval": {
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "reciprocal_rank": 0.0
+    },
+    "contexts": [
+      "words are being defined? 1 be the right size fit 2 not cheap, but not expensive 3 a large cupboard for keeping clothes in 4 popular with people at a particular time 5 the place where you try on clothes in a shop 6 Armani and Calvin Klein are examples of this 7 a person who works in a shop 8 look after customers and help them to buy things 22.4 Complete the dialogues. SHOP ASSISTANT: Can I help you? CUSTOMER 1: I'm 1 looking for a top. This one's quite nice. I think I'll 2 it on. SHOP ASSISTANT: Of course. The 3 room is just over there. SHOP ASSISTANT: Do you need any help? CUSTOMER 2: No, I'm being 4 , thanks. SHOP ASSISTANT: How was the top? CUSTOMER 1: I'm afraid it didn't 5 very well. It was a bit 6 SHOP ASSISTANT: Oh, that's a 7 under the arms. . Would you like a bigger size? CUSTOMER 1: No, I don't think so. In actual fact, it wasn't just the 8 . I don't think it 9 me, actually. I think it's really for a younger person. I'll 10 it, thanks. 22.5 Over to you Look at the text at the top of the opposite page again. Which statements are true for you? If possible, compare your answers with someone else. 23 Shopping A In a supermarket 3 the place where you go into a building 4 a line of people who are waiting for something 5 an item is a single thing 6 If you are likely to do something, you will probably do it. 7 cheaper prices than normal B Shopping centres and street markets Exercises 23.1 True or false? If a sentence is false, change it to make it true. 1 If you have a lot of things to buy, you need a basket. False. If you have a lot of things to buy, you need a trolley. 2 Supermarkets arrange things to make us spend more money. 3 The checkout is where you pay for things. 4 Expensive items are on the top shelves. 5 If something is fresh, it has just been made. 6 There are often lovely smells near the entrance. 7 Sweets are often near the checkout. 8 It's always a good idea to buy things on special offer. 23.2 Mark the main stress on these words. Use the index to help you. 'atmosphere convenient checkout entrance a refund replace item 23.3 Are these statements true of shopping centres, street markets, or both? 1 They are usually quite modern. shopping centres 2 Everything is under one roof. 3 You buy things from stalls. 4 You can haggle. 5 You can normally get refunds. 6 They can be very convenient. 23.4 Complete the sentences. 1 I took the shoes back to the shop, but they wouldn't give me a refund . 2 It me angry when shops refuse to give you a refund or things. 3 I often buy bananas but forget to eat them, and then I have to them away."
+    ]
+  },
+  {
+    "question": {
+      "id": "q20",
+      "text": "Give one example of an adjective-noun partnership in the passage about common word partners.",
+      "ground_truth": "One example is 'heavy traffic'.",
+      "category": "fact",
+      "gold_pages": [
+        155
+      ],
+      "gold_spans": [
+        "There was heavy traffic on the motorway going out of town."
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Một ví dụ về sự kết hợp tính từ-danh từ trong đoạn văn về các cặp từ thông dụng là \"large number\" (số lượng lớn) hoặc \"wide choice\" (nhiều lựa chọn), xuất hiện trong câu: \"We've got a large number of students/tourists this year. ... There's awide choice of food available.\"",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:112",
+      "3a357be041df101c:8",
+      "3a357be041df101c:158",
+      "3a357be041df101c:20",
+      "3a357be041df101c:107"
+    ],
+    "retrieval_scores": [
+      0.03278688524590164,
+      0.02967032967032967,
+      0.029206349206349208,
+      0.028612012987012988,
+      0.028404512489927477
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "lot', but where we usually use a particular adjective. We've got a large number of students/tourists this year. (opp a limited/small number) I will need a large amount of money. There's awide choice of food available. (opp a limited/narrowchoice) Sergio has awide vocabulary in English. (opp a limited vocabulary) It's only a toy gun but it makes a very loud noise. Her family is of great importance to her. We went to a party last night and it was great fun [very enjoyable; we enjoyed it a lot]. There was heavy traffic on the motorway going out of town. (opp light traffic) D Adverbs and adjectives The adverbs in the first three sentences mean very, the adverbs in the last sentence mean fully/completely. In each case, the adverbs and adjectives are common word partners. I'mterribly sorry I'm late. She'swell aware of the problem. [She knows all about the problem.] It's vitally important that we get the right person for the job. Ava is fast asleep, but the other two are still wide awake. Language help Moreword partners can be found in the Cambridge Learner's Dictionary for intermediate learners and the Cambridge Advanced Learner's Dictionary. Exercises 74.1 Correct the mistakes. 1 Why does she do so many mistakes? make 2 My sister got a baby last month. 3 I'm sorry I'm late; I lost the bus. 4 There was an accident and Tommy has a grave head injury. 5 I don't know if I can come - it depends of the weather. 6 We passed three days in Amsterdam. 7 I wouldn't like to try and say the future. 8 My sister is waiting for a baby next month. 9 Axel said me a very funny joke. 10 She gave us a big amount of money. 74.2 Complete the text. My mum went to see the doctor, and he told her to go on a 1 diet . I think she knows that she needs to 2 weight, but she's not happy about giving up chocolate. Anyway, I told her it's 3 important that she keeps to the diet, because if she 4 any more weight, it's quite 5 that she'll end up with a more 6 illness. Fortunately, I think she's 7 aware of that. 74.3 Replace big or littlewith a more suitable adjective. 1 You won't need a big amount of money. 2 Why are they making such a big noise? 3 I've got quite a big vocabulary in French. 4 There is only a little choice of things we can buy. 5 We had a very big number of tourists this year. 6 I think the event had big importance for her. 7 Isabel only has a little vocabulary in English. 74.4 Complete the sentences and dialogues. 1 A: Why were they late? B: They got stuck in heavy traffic. 2 When I went into her bedroom, she was asleep. 3 A: Did you enjoy last night? B: Yes, it was fun. 4 I met Sasha in town. She told me she's a baby in June. Isn't that fantastic news?"
+    ]
+  },
+  {
+    "question": {
+      "id": "q22",
+      "text": "What can 'get rid of' something mean?",
+      "ground_truth": "It can mean throw it away, give it away, or sell it.",
+      "category": "fact",
+      "gold_pages": [
+        173
+      ],
+      "gold_spans": [
+        "I'd like to get rid of my old CDs. [throw them away, give them away, or sell them]"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "According to the provided text, \"get rid of\" something means to **throw them away**, **give them away**, or **sell them**.",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:128",
+      "3a357be041df101c:127",
+      "3a357be041df101c:196",
+      "3a357be041df101c:47",
+      "3a357be041df101c:180"
+    ],
+    "retrieval_scores": [
+      0.031754032258064516,
+      0.03149801587301587,
+      0.029211087420042643,
+      0.028298204527712725,
+      0.02821939586645469
+    ],
+    "retrieval": {
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.4,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "bedtime story helps children get to sleep [start sleeping]. The salsa classes are a chance for us to get together [meet and spend time together]. I'm sorry I got the number wrong [said or wrote something that was not correct]. My cold is getting worse [becoming more unpleasant; opp getting better]. I'd like to get rid ofmy old CDs. [throw them away, give them away, or sell them] I got to know lots of Americans when I stayed in San Francisco. [met and became friends with] C Phrasal verbs He stopped the car and I got out [left the car; also leave a building]. I gave her £25, but I'll get it back tomorrow. [have it returned to me] The door was locked so we couldn't get in [enter a place, especially when it is difficult]. Our train should get in around midnight. [arrive] What time did you get up this morning? [get out of bed] I'll never get this essay finished; it's too difficult. I need to getmy hair cut. I gotmy watch repaired today. Exercises 83.1 Write a synonym for get in each of these sentences. 1 I usually get about five emails a day. receive 2 Where can I get something to eat round here? 3 I'm just going to get some paper from the office. I'll be back in a minute. 4 What time did they get here last night? 5 He got very angry when I told him what you did with his CDs. 6 I couldn't get a room; all the hotels were full. 7 The phone's ringing. Could you get it for me? 8 Molly sent me a card but I never got it. 83.2 Complete the dialogues using getting + a suitable adjective. Add other words if necessary. 1 A: It's getting cold in here . B: Yes, it is. I'll turn on the heating. 2 A: I'm . B: Me too. Let's have something to eat. 3 A: I'm . B: Yes, me too. I'll open the window. 4 A: It's . B: Yes, it is. I'll put the lights on. 5 A: It's . B: Yes, it is. I think I'll go to bed. 6 A: My English is . B: No, it isn't - it's much better now. 83.3 Rewrite the sentences using a phrase or phrasal verb with get. Keep a similar meaning. 1 Will the books be returned to you? Will you get the books back? 2 We must meet up and have a meal. We must 3 How do you meet people and make friends in this country? How do you 4 I must contact the travel company. I must 5 I'd like to throw away these old magazines. I'd like to 6 The train won't arrive before 10 o'clock. The train won't 7 The doors were locked; we couldn't leave. The doors were locked; we couldn't 8 I was awake for hours last night. I couldn't 83.4 Continue these statements in a suitable way. 1 The window is broken. We need to get it repaired. 2 My"
+    ]
+  },
+  {
+    "question": {
+      "id": "q24",
+      "text": "After 'as soon as', which form does the example use: 'I get there' or 'I will get there'?",
+      "ground_truth": "It uses the present form 'I get there'.",
+      "category": "reasoning",
+      "gold_pages": [
+        192
+      ],
+      "gold_spans": [
+        "I'll give them your message as soon as I get there."
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Sau cụm từ \"as soon as\", ví dụ trong văn bản sử dụng dạng **'I get there'**.\n\nThông tin này được lấy từ đoạn văn bản, cụ thể là câu số 2 trong phần bài tập: \"I'll give them your message as soon as I **get** / will get there.\" (Trong ngữ pháp tiếng Anh, sau các liên từ chỉ thời gian như *when*, *as soon as*, ta thường dùng thì hiện tại đơn để diễn tả hành động tương lai, thay vì thì tương lai đơn).",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:143",
+      "3a357be041df101c:142",
+      "3a357be041df101c:144",
+      "3a357be041df101c:129",
+      "3a357be041df101c:92"
+    ],
+    "retrieval_scores": [
+      0.03278688524590164,
+      0.03200204813108039,
+      0.031054405392392875,
+      0.029273504273504274,
+      0.02821939586645469
+    ],
+    "retrieval": {
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.4,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "(NOT I'll see you when I will get there.) We don't use a future form after when / as soon as. B Two things happening at the same time Violet got readywhile I cooked the dinner. [two long actions] The accident happenedwhile I was on my way to work. [a longer action 'on my way to work' and a short action 'the accident'; we can also usewhen or as here.] I saw him (just) as I came out of the office. [two short actions happening at the same time; we can also usewhen here] C One thing after another We met the others in the café, and then / after that / afterwardswe went to the match. I talked to Joe, and afterwards [at a later time but usually the same day] I came home. I was in Caracas for three months, and then / after that I went to Colombia. Aftermy visit to New York, I decided to have a rest. We had something to eat before going out. D A sequence* of actions We had a really nice holiday. First of all / First we spent a few days in St Moritz. After that / Thenwe drove down the coast and stayed in Portofino for a week. Finally, we went back to Switzerland to stay with my uncle. (Finally is used here to introduce the last thing in a list.) * one action after another, and so on E At first … eventually To begin with, the two girls got on very well when they shared the flat. But after a while [a period of time], they started arguing about various things, and eventually [finally, after a long time or a lot of problems] Lauren walked out and found a new place. At first I enjoyed the classes, but after a while it got a bit boring, and in the end [finally, after a period of time or thought] I left. F A list of reasons We can use firstly / for one thing / for a start to introduce a first reason for something, and then secondly/besides/anyway to add a further reason. A: What's wrong with her new dress? B: Firstly, it's a horrible colour, and secondly, I don't think it suits her. A: Why can't we go out tonight? B: Well, for one thing / for a start, I've got a lot of work - and besides/anyway, I can't afford it. Common mistakes After seeing the film, we went home. (NOT After see the film, we went home.) Exercises 92.1 Find five more pairs of words/phrases that are similar in meaning. then for one thing when besides finally at first for a start in the end after that to begin with as soon as anyway then / after that 92.2 Choose the correct word to complete the sentences. Sometimes both are correct. 1 I rang my mum when / while I was waiting for my train. 2 I'll give them your message as soon as I get / will get there. 3 Maria cleaned the kitchen as /"
+    ]
+  },
+  {
+    "question": {
+      "id": "q26",
+      "text": "What word describes a person who is quite tall, using the suffix discussed in the passage?",
+      "ground_truth": "The suffix '-ish' can mean 'quite', so 'tallish' means quite tall.",
+      "category": "reasoning",
+      "gold_pages": [
+        28
+      ],
+      "gold_spans": [
+        "We can use the suffix -ish at the end of some adjectives to mean 'quite'"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "The word that describes a person who is quite tall, using the suffix discussed in the passage, is **tallish**.\n\nThis is based on the information in the text which states: \"We can use the suffix -ish at the end of some adjectives to mean 'quite', e.g. ... He's twentyish.\" Additionally, the dialogue example includes the phrase: \"Is he tall? B: Er, **tallish** [quite tall]...\"",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:16",
+      "3a357be041df101c:109",
+      "3a357be041df101c:107",
+      "3a357be041df101c:108",
+      "3a357be041df101c:95"
+    ],
+    "retrieval_scores": [
+      0.03177805800756621,
+      0.031754032258064516,
+      0.03055037313432836,
+      0.030536130536130537,
+      0.028531243721117136
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "people in height and weight, you can say they are average. A: How tall is Hannah? A: Is Marco quite big? B: Medium height, I'd say. B: No, about average. C Hair blonde (or blond) straight fair brown dark black wavy curly D Talking about someone's appearance A: What does Sophia's boyfriend look like? [Can you describe his appearance?] B: He's blond, and quite good-looking. A: Is he tall? B: Er, tallish [quite tall], but he's got broad shoulders [wide; opp narrow]. He looks very athletic [strong, healthy and often good at sports]. I think he does a lot of sport. A: Is he quite smart [clean, tidy and stylish]? B: Yeah, he dresses quitewell [the clothes he wears are quite nice]. Language help We can use the suffix -ish at the end of some adjectives to mean 'quite', e.g. She's got longish hair, and at the end of some numbers to mean 'more or less', e.g. He's twentyish. Common mistakes Remember that 'hair' is uncountable, e.g. She's got straight hair. (NOT She's got straight hairs.) Also: She's got long black hair. (NOT She's got a long black hair.) Exercises 10.1 Complete the sentences. 1 She's got straight hair . . 2 Isabella is very good-. 3 Beata's got blonde . 4 Her brother's got very broad . 5 That's a nice suit: Jack's very today. 6 I would say he was medium . 7 Charlotte's hair is fair but her brother's is quite . 10.2 Find six more pairs of words in the box. Why are they pairs? attractive height average good-looking weight narrow roughly tall curly approximately medium wavy broad weigh Attractive and good- looking are similar in meaning. 10.3 Complete the dialogues using words that are similar to the underlined words. 1 A: She's good-looking. B: Yes, very attractive . 2 A: María José looked beautiful last night. . B: Yes, absolutely 3 A: Her boyfriend's quite good-looking. . B: Yes, he is rather 4 A: Andreas looks very strong and healthy. . B: Yes, I think he's very 5 A: That little girl is attractive, isn't she? . B: Yes, she's very 6 A: Ethan's getting fat. . B: Yes, he is a bit 7 A: Did you think he was a bit ugly? . B: Yes, he was quite 8 A: Is she about 25? . B: Yes, 9 A: He's just above average height. B: Yes, he is , isn't he? 10.4 Over to you Answer the questions. 1 How tall are you? 2What's your hair like? 3 Think about one of your best friends. What does he/she look like? A What are you like? 2 believe that good things will happen 3 can be trusted to do what people expect you to do 4 feeling sure about yourself and your abilities 5 not confident, especially about meeting or talking to new people 6 putting a lot of effort into your work and spending a lot of time on it 7 the ability to laugh and understand when something is funny 8 a serious person is"
+    ]
+  },
+  {
+    "question": {
+      "id": "q28",
+      "text": "Why does the book prefer 'illness' rather than 'disease' for a period of being unwell?",
+      "ground_truth": "It says disease is not used for a period of illness; illness is the appropriate word.",
+      "category": "reasoning",
+      "gold_pages": [
+        47
+      ],
+      "gold_spans": [
+        "Disease is not used about a period of illness"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.\n\n(Lưu ý: Tài liệu cung cấp giải thích rằng \"Disease\" không được dùng để nói về một khoảng thời gian bị bệnh, ví dụ: \"He died after a long illness\" thay vì \"He died after a long disease\". Tuy nhiên, tài liệu không nêu lý do cụ thể tại sao sách lại *ưu tiên* từ \"illness\" cho trường hợp này, mà chỉ đưa ra quy tắc sử dụng và ví dụ minh họa).",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:32",
+      "3a357be041df101c:118",
+      "3a357be041df101c:90",
+      "3a357be041df101c:59",
+      "3a357be041df101c:112"
+    ],
+    "retrieval_scores": [
+      0.03177805800756621,
+      0.027236652236652236,
+      0.026625704045058884,
+      0.025739237015474183,
+      0.024696969696969696
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "body for medical reasons; also called surgery]. Lung cancer can be caused by smoking. Heart attacks can happen very suddenly. Hepatitis is a disease affecting the liver. Language help Disease is used to talk about more serious medical problems, often affecting certain parts of the body, e.g. heart disease. Illness is used to talk about serious and minor medical problems and those affecting the mind, e.g. mental illness. Disease is not used about a period of illness, e.g. He died after a long illness. (NOT He died after a long disease.) Exercises 20.1 Look at the underlined letters in each pair of words. Is the pronunciation the same or different? Use the index to help you. 1 ache pain same 2 cold stomach different -. 3 cough through 4 flu cut 5 liver disease 6 stomach operation 7 chemist ache 8 patient bandage 20.2 Complete the sentences with a or nothing (-). 1 She's got hepatitis. - 2 I've got cough. a 3 I'm getting sore throat. 4 Ben's got headache. 5 Luis's got temperature. 20.3 Complete the dialogues. 1 A: Does your finger hurt? B: Yes, it's very painful . 2 A: What's wrong with Dimitrios? B: He feels . I think it's something he ate. 3 A: Did you hit your foot? B: Yes, and it really . 4 A: My hand's bleeding quite badly. B: Well, put a round it. 5 A: Your finger's . B: I know. I cut it using that knife. 6 A: Does Tanya still from bad headaches? B: Yes, she gets them all the time. 7 A: What's the matter? B: My back from sitting at that computer all day. 8 A: I understand Lena has had quite a illness. B: Yeah. She was in hospital for over a week. 20.4 Find five more pairs of words. Why are they pairs? lung heart surgeon tablets/pills attack liver operation cancer hepatitis sore medicine throat lung and cancer - because you can get lung cancer. 6 I've got backache. 7 Zarita's got flu. 8 My uncle had heart attack. 9 She's got cancer. 10 I've got pain in my foot. 20.5 Over to you Answer the questions. If possible, compare your answers with someone else. 1What do you usually do if you get a headache? 2How often do you get a cough or a sore throat? 3Have you ever been a patient in hospital? If so, what was it like? 4Have you ever had surgery? 5 Are there some medicines you always keep in your home? What are they? A Smart, stylish and casual I think the woman looks stylish [wearing nice clothes and looking attractive; alsowell- dressed]. The man is smartly dressed [clean and tidy and suitable for formal situations]. The boy's clothes are more casual [comfortable and suitable for informal situations]. B Verbs and phrases used with clothes As soon as I get up, I have a shower and get dressed [put on my clothes]. I don't eat breakfast. I prefer jackets with a zip; it's easier to undo a zip [open a zip,"
+    ]
+  },
+  {
+    "question": {
+      "id": "q30",
+      "text": "What benefit did the company give the new father in the work example?",
+      "ground_truth": "The company gave him extra time off to be with his wife after the birth.",
+      "category": "fact",
+      "gold_pages": [
+        80
+      ],
+      "gold_spans": [
+        "the company gave him extra time off to be with her after the birth"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "The company gave the new father extra time to be with his wife after the birth of their baby.",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:56",
+      "3a357be041df101c:57",
+      "3a357be041df101c:55",
+      "3a357be041df101c:59",
+      "3a357be041df101c:60"
+    ],
+    "retrieval_scores": [
+      0.031544957774465976,
+      0.03125763125763126,
+      0.031099324975891997,
+      0.03057889822595705,
+      0.029910714285714284
+    ],
+    "retrieval": {
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.4,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "team on a day-to- 5 basis. It's not a nine-to- 6 job: Alexander has to do a lot of 7 . Fortunately he can 8 a lot more money by doing this, and his working 9 are quite good. After income 10 he makes £60,000 11 year. Recently his wife had a baby, but the company gave him extra time 12 to be with her after the birth. Kelly Bradbury is a financial adviser for a bank. She specialises in mortgages, which means that she 13 people who want to buy a flat or a house. At the moment Kelly spends a lot of her time 14 with young people who are trying to buy a property for the first time, which is not easy. She works 15 hours - 9 am to 5 pm - and she doesn't have to 16 overtime. 36.5 Over to you Answer the questions about working conditions in your country. If possible, compare your answers with someone else. 1What are normal working hours for most office jobs in your country? 2How much income tax do most people pay? (e.g. 10% or 20% of what they earn) 3 Do male and female workers normally get time off if they have a baby? If so, how much? 4 Is there a minimum wage? If so, do you know what it is? A Getting a job* When I left school, I applied for 1 jobs in different companies, and finally, after sending out lots of CVs 2 and having some interviews 3 , a small company employedme 4 . I didn't earn a lot, but the company gave me some training 5 , which was good. finding a job 1 wrote a letter of application for 2 a document which describes your education and the jobs you have done 3 a meeting where someone asks you questions to see if you are suitable for a job 4 gave me a job 5 help and advice to learn how to do a job or activity Common mistakes I had some training. (NOT I had a training.) You can also go on / do a training course [a period of organised help and advice, often in a different place] (NOT formation or stage). B Promotion I worked hard and soon I was promoted [given a better job with more responsibility]. They also gave me a good pay rise [more money]. It was really good experience [knowledge you get from doing something such as a job], and when my boss left the company a few years later, they gave me an important promotion [a move to a higher job in the company]. C Resignation* By my mid-twenties, I was getting a bit bored, and decided I wanted to work abroad [in another country]. So, I quit my job [told the company I was leaving; syn resign] and started looking for jobs in the UK. After a couple of months I got a job in London. At first I liked it, but … when you say officially you are leaving a job D"
+    ]
+  },
+  {
+    "question": {
+      "id": "q32",
+      "text": "What accommodation preference does Ruth express in the weekend-break dialogue?",
+      "ground_truth": "She would prefer somewhere smaller with breakfast included.",
+      "category": "fact",
+      "gold_pages": [
+        100
+      ],
+      "gold_spans": [
+        "I'd prefer somewhere a bit smaller, with breakfast included."
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Ruth expresses a preference for \"somewhere a bit smaller, with breakfast included.\"",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:72",
+      "3a357be041df101c:115",
+      "3a357be041df101c:71",
+      "3a357be041df101c:25",
+      "3a357be041df101c:75"
+    ],
+    "retrieval_scores": [
+      0.030090497737556562,
+      0.029437229437229435,
+      0.027623285131627734,
+      0.026767330130404943,
+      0.026553280111072546
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.4,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "for our 1 weekend break? HARRY: What about this hotel? It has great 2 online. Five stars! RUTH: I'd prefer somewhere a bit smaller, with breakfast included. HARRY: OK, here's a nice 3 in the countryside. HANS: Have you found any 4 yet? PAULA: Yes, I've booked a four-star hotel in the city centre. HANS: Was it very expensive? PAULA: No, it was part of a 5 , so the hotel was included in the price. 46.3 Circle the words from B and C to complete each sentence. 1 Many travellers prefer to book / take their holiday online, rather than on the phone. 2 Spain is a popular holiday accommodation / destination among British holiday-makers. 3 If you book a package holiday / weekend break, you don't have to book flights separately. 4 The apartment listing / password doesn't say if it has wi-fi or not. We'll have to email them. 5 The central heating / iron is broken and Sara's clothes are all creased. 6 The house has listing / central heating, so it is warm all through the winter months. 46.4 Look at C opposite. Correct the mistakes. 1 When you arrive, you can pick out the keys from the reception desk. up 2 I recommence renting a car, as public transport is not very good. 3 The nearer train station is a five minute walk away. 4 The wi-fi passport is written on a piece of paper next to the computer. 5 I like staying in this area. There are quite a few nice cafés nearly. 6 To switch out the air conditioning, press this button. 46.5 Over to you Answer these questions. If possible, compare your answers with someone else. 1What type of holiday from A do you prefer? 2Do you read hotel reviews before you book online? 3Where do you like to stay when you travel: in a hotel, in a B&B or in a private apartment? 47 Air travel A Departure* When you arrive at an airport, the departures boardwill show you the flight numbers (e.g. BA735), departure times (e.g. 08.40), and destinations 1 . At check-in / the check-in desk, someone will check your ticket andweigh 2 your luggage. If it is more than, for example, 20 kilograms, you will have to pay excess baggage 3 . You can take your hand luggage with you on the aircraft 4 . You also get your boarding card 5 and then you can go through passport control, where someone checks your passport 6 , and into the departure lounge, where you can buy things in the duty-free shop, e.g. cigarettes and perfume. Shortly before take-off 7 , you go to the place where you get on the plane, e.g. Gate 3 or Gate 5. When you board the plane 8 , you can put your hand luggage in a small cupboard above your seat called an overhead locker. You then have to fasten your seat belt. If there are no delays 9 , the plane moves slowly to the runway 10 , then it takes off."
+    ]
+  },
+  {
+    "question": {
+      "id": "q34",
+      "text": "If a train 'gets in' around midnight, what does that mean?",
+      "ground_truth": "It means the train arrives around midnight.",
+      "category": "fact",
+      "gold_pages": [
+        173
+      ],
+      "gold_spans": [
+        "Our train should get in around midnight. [arrive]"
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "If a train \"gets in\" around midnight, it means the train will **arrive**.",
+    "abstained": false,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:128",
+      "3a357be041df101c:122",
+      "3a357be041df101c:129",
+      "3a357be041df101c:46",
+      "3a357be041df101c:43"
+    ],
+    "retrieval_scores": [
+      0.02976190476190476,
+      0.028991596638655463,
+      0.028177225029148854,
+      0.027651515151515153,
+      0.02750455373406193
+    ],
+    "retrieval": {
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0
+    },
+    "contexts": [
+      "bedtime story helps children get to sleep [start sleeping]. The salsa classes are a chance for us to get together [meet and spend time together]. I'm sorry I got the number wrong [said or wrote something that was not correct]. My cold is getting worse [becoming more unpleasant; opp getting better]. I'd like to get rid ofmy old CDs. [throw them away, give them away, or sell them] I got to know lots of Americans when I stayed in San Francisco. [met and became friends with] C Phrasal verbs He stopped the car and I got out [left the car; also leave a building]. I gave her £25, but I'll get it back tomorrow. [have it returned to me] The door was locked so we couldn't get in [enter a place, especially when it is difficult]. Our train should get in around midnight. [arrive] What time did you get up this morning? [get out of bed] I'll never get this essay finished; it's too difficult. I need to getmy hair cut. I gotmy watch repaired today. Exercises 83.1 Write a synonym for get in each of these sentences. 1 I usually get about five emails a day. receive 2 Where can I get something to eat round here? 3 I'm just going to get some paper from the office. I'll be back in a minute. 4 What time did they get here last night? 5 He got very angry when I told him what you did with his CDs. 6 I couldn't get a room; all the hotels were full. 7 The phone's ringing. Could you get it for me? 8 Molly sent me a card but I never got it. 83.2 Complete the dialogues using getting + a suitable adjective. Add other words if necessary. 1 A: It's getting cold in here . B: Yes, it is. I'll turn on the heating. 2 A: I'm . B: Me too. Let's have something to eat. 3 A: I'm . B: Yes, me too. I'll open the window. 4 A: It's . B: Yes, it is. I'll put the lights on. 5 A: It's . B: Yes, it is. I think I'll go to bed. 6 A: My English is . B: No, it isn't - it's much better now. 83.3 Rewrite the sentences using a phrase or phrasal verb with get. Keep a similar meaning. 1 Will the books be returned to you? Will you get the books back? 2 We must meet up and have a meal. We must 3 How do you meet people and make friends in this country? How do you 4 I must contact the travel company. I must 5 I'd like to throw away these old magazines. I'd like to 6 The train won't arrive before 10 o'clock. The train won't 7 The doors were locked; we couldn't leave. The doors were locked; we couldn't 8 I was awake for hours last night. I couldn't 83.4 Continue these statements in a suitable way. 1 The window is broken. We need to get it repaired. 2 My"
+    ]
+  },
+  {
+    "question": {
+      "id": "q36",
+      "text": "What two kinds of break are mentioned in addition to lessons during a school day?",
+      "ground_truth": "The example mentions a one-hour lunch break and a break in both the morning and afternoon.",
+      "category": "multi_chunk",
+      "gold_pages": [
+        70
+      ],
+      "gold_spans": [
+        "There's usually a one-hour lunch break, and a break in the morning and afternoon as well."
+      ],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:49",
+      "3a357be041df101c:48",
+      "3a357be041df101c:46",
+      "3a357be041df101c:146",
+      "3a357be041df101c:145"
+    ],
+    "retrieval_scores": [
+      0.03225806451612903,
+      0.03177805800756621,
+      0.029910714285714284,
+      0.029206349206349208,
+      0.02844551282051282
+    ],
+    "retrieval": {
+      "recall_at_k": 0.5,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 0.5
+    },
+    "contexts": [
+      "the age of eleven they go to school. 4 When they're sixteen they exams, and afterwards they can go to a college for if they want. 5 Many pupils at school for another two years and do 'A' levels. 6 Nowadays, a lot of pupils to university after they leave school. 32.3 Choose the correct word to complete the sentences. Sometimes both are correct. 1 We take / do exams in the summer. Both are correct. 2 The school timetable / schedule is more or less the same every day. 3 The day is divided into / out of seven lessons. 4 The pupils do / study about ten subjects. 5 There is usually a rest / break three times a day. 6 Schools often break out / break up after they finish exams. 7 After pupils leave school, many of themtake / get a job. 8 Pupils canwear / dress the way they want. 32.4 Complete the sentences. 1 There were three terms in the school year. 2 I had to a uniform. 3 I had to call the teachers 'sir' and teachers 'miss'. 4 I occasionally got into at school for doing things I shouldn't do. 5 The teachers at my school were strict, and they pupils who broke the rules. 6 My school had a really nice, relaxed . 32.5 Over to you Answer the questions about the education system in your country. If possible, compare your answers with someone else. 1 Do you have state schools and private schools? 2 Do all children have nursery education? 3When do children go to primary school and secondary school? 4 Do all schools have the same terms? 5When can children leave school? 6 Do pupils normally have to wear a uniform, or can they wear what they want? 7 Are teachers usually quite strict? 8 Is the atmosphere quite relaxed in most schools? 33 Studying English and taking exams A How are they getting on?* This is what Nastya, an English teacher, thinks about some of her students. Jade has awide vocabulary [knows a lot of words] and speaks very accurately [without mistakes], but she needs to practise her speaking more inordertobecomemorefluent[abletospeaknaturallywithoutstopping]. Angel is quite fluent, but his accent [the way he pronounces words] is not very good. In particular, he has problems with certain consonants [letters of the alphabet (a-z), which are not the vowels a, e, i, o, u]. Jose has no problemmaking himself understood [saying things in a way people understand], but he needs to increase his vocabulary [make it bigger], becauseatthemomentit'squitebasic[elementary;synsimple]. Nastya Olga is alwayswilling to [happy and ready to] experiment with language [try something new to see what it is like]. For that reason she sometimes gets things wrong [makes mistakes], but she learns from her mistakes and she's making a lot of progress. Andreas is a fantastic language learner. He picks things up [learns things without trying] very quickly, and he has a good ear for language [is good at hearing, repeating and understanding sounds and words]. *What progress are they making? Common mistakes We"
+    ]
+  },
+  {
+    "question": {
+      "id": "q42",
+      "text": "What is the latest version of Python?",
+      "ground_truth": "The corpus does not provide information to answer this question.",
+      "category": "out_of_scope",
+      "gold_pages": [],
+      "gold_spans": [],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:80",
+      "3a357be041df101c:69",
+      "3a357be041df101c:87",
+      "3a357be041df101c:82",
+      "3a357be041df101c:66"
+    ],
+    "retrieval_scores": [
+      0.027118043247075507,
+      0.0265113137453563,
+      0.02501516070345664,
+      0.022772772772772773,
+      0.022767295597484277
+    ],
+    "retrieval": null,
+    "contexts": [
+      "says in the paper / According to the paper … (NOT It's written in the paper … ) When we refer to something that someone has said or written, we do it in these ways: It said in The Times that the plane crashed in the sea. According to the news on TV last night, the plane crashed in the sea. *reporting in newspapers, on TV or the Internet Exercises 52.1 Tick (✓) the words which describe a type of TV programme. the news ✓ documentary chat show review article headline soap opera series 52.2 Complete the dialogues. 1 A: Have you heard of 'Radio Five Live'? B: Yes, it's a very popular station . 2 A: Is the magazine published every day? B: No, it monthly. 3 A: Is it a national paper? B: No, it's a paper for the south-west. 4 A: Can we watch the news now? B: Yes, it's on Four. 5 A: Are they mostly famous people? B: Yes, they're all . 52.3 Complete the crossword. What is the vertical word in grey? 1 a famous person 2 a number of programmes with the same characters 3 a piece of writing about a news item 4 programmes several times a week about the same people 5 happening every day 6 a factual programme about real people and situations 7 relating to the whole country 8 a programme that interviews famous people 9 a piece of writing about an important subject 52.4 Complete the sentences. 1 Did you read that article in the paper yesterday about space? 2 The manager was interviewed for the paper by one of their well-known . 3 Do you understand this ? '200 WOMEN GIVEN WRONG DIAGNOSIS' 4 Rock FM is the name of a radio . 5 It in the paper that the interest rate is likely to go up soon. 6 I read a of his latest film. It doesn't sound very good. 7 You often see in the paper which promise that you can learn a language in ten hours with this method. It isn't true. 8 to the weather last night, it's going to rain today. 9 I never watch operas. 10 I love The X Factor; in fact, I love all TV shows! 52.5 Over to you Answer the questions. If possible, compare your answers with someone else. 1How many daily national newspapers are there? 2How many newspapers only come out on Sunday in your country? 3What parts of the newspaper do you read? 4 What types of TV programme do you watch? 53 Phoning and texting A Starting a phone conversation The call on the left is between two friends: Joe and Lily. When British people answer the phone at home, they usually just say 'hello'. The call on the right is a more formal business call. JOE: Hello? LILY: Is that Joe? JOE: Yeah. LILY: Hi. It's Lily. Common mistakes We say: Is that Joe? (NOT Are you Joe? or Is it Joe?) And we say: It's Lily. (NOT I am Lily or Here is Lily.)"
+    ]
+  },
+  {
+    "question": {
+      "id": "q44",
+      "text": "What is the exchange rate between the US dollar and Vietnamese dong today?",
+      "ground_truth": "The corpus does not provide information to answer this question.",
+      "category": "out_of_scope",
+      "gold_pages": [],
+      "gold_spans": [],
+      "author_date": "2026-11-18",
+      "split": "held_out"
+    },
+    "config": "v2b_norerank",
+    "answer": "Tài liệu không có đủ thông tin để trả lời.",
+    "abstained": true,
+    "retrieved_chunk_ids": [
+      "3a357be041df101c:63",
+      "3a357be041df101c:62",
+      "3a357be041df101c:80",
+      "3a357be041df101c:47",
+      "3a357be041df101c:11"
+    ],
+    "retrieval_scores": [
+      0.03252247488101534,
+      0.03252247488101534,
+      0.02886002886002886,
+      0.02877846790890269,
+      0.025708635464733027
+    ],
+    "retrieval": null,
+    "contexts": [
+      "made a profit of / for six million euros. 2 Sales rose to / by 10% last year. 3 The value of the shares fell from / for 240 pence to 225 pence. 4 There was a fall of / from5% in the value of the shares. 5 There has been a gradual risewith / in profits. 6 The company made a loss two years on / in a row. 7 What's the current value of / in the euro? 40.2 Which words or phrases are being defined? 1 The amount of money that something can be sold for. 2 Money you borrow from a bank for your business. 3 What the bank charges you when you borrow money. 4 The rate at which prices increase. 5 The money that a company receives for its goods after paying all the costs. 6 Buying and selling goods and services between countries. 7 A movement in sales, prices, etc. over a period of time. 40.3 Complete the two short texts, then answer each of the two questions. 1 If you get a bank of €500 for one year and the bank you 20% , how much will you have to to the bank at the end of the year? 2 If you take out a similar amount from another bank, and the interest is 15 , how much will you at the end of the year? 40.4 Look at the graph and complete the text. The 1 graph shows sales 2 for the last three and a half years. Three years ago sales 3 slightly and reached 100,000 units by the end of the year. The company 4 a profit of almost £500,000 and decided to 5 the price from £8.95 to £10.25. It had an immediate effect: there was a 6 7 in sales over the year. It was bad news, and the company made a 8 . And in the next year sales 9 the same. However, in the first two 10 of this year, they have 11 12 for the first time in many years. 40.5 Over to you Can you answer these questions about your own country? 1What is the inflation rate at the moment? 2 If you borrow money from the bank, what is the approximate interest rate you will be charged? 3 Do you think the economy is doing well or badly? 4When was the last time your country was in recession? 5What is the value of your currency against the dollar? value A Sports Language help We play sports such as football, ice hockey, tennis, golf and basketball. I play football in the winter. I play basketball twice a week. We use gowith other sports and activities, especially those ending in -ing. I go swimming in the lake during summer. We often go rock climbing in the mountains. We use dowith a lot of / a bit of + -ing. I did a bit of sailing in the holidays. I don't do a lot of running these days. B Leisure activities* tent camping rock climbing jogging yoga"
+    ]
+  }
+]

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import multiprocessing as mp
-from queue import Empty
+import time
 from pathlib import Path
+from queue import Empty
 from typing import Any
 
 from .chunking import Block
@@ -51,24 +52,34 @@ def _parse_worker(path_str: str, queue: Any) -> None:
             heading = normalize_text(str(text)) if "heading" in label.lower() else None
             blocks.append((normalize_text(str(text)), page, heading))
         queue.put(("ok", blocks, len(getattr(document, "pages", {}))))
-    except Exception as exc:  # child process boundary: send a safe message only
+    except (ValueError, RuntimeError, OSError, ImportError, AttributeError, TypeError) as exc:
         queue.put(("error", f"{type(exc).__name__}: {exc}"))
 
 
 def _collect_worker_result(process: mp.Process, queue: Any, timeout_s: int) -> Any:
-    try:
-        message = queue.get(timeout=timeout_s)
-    except Empty as exc:
-        if process.is_alive():
-            process.terminate()
-            process.join()
-        raise IngestError("parser exited without text") from exc
-    process.join(timeout_s)
-    if process.is_alive():
-        process.terminate()
-        process.join()
-        raise IngestError("parse timed out")
-    return message
+    deadline = time.monotonic() + timeout_s
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            if process.is_alive():
+                process.terminate()
+                process.join()
+            raise IngestError("parser exited without text")
+        try:
+            message = queue.get(timeout=min(0.1, remaining))
+        except Empty:
+            if not process.is_alive():
+                process.join()
+                raise IngestError("parser worker exited without text")
+            continue
+        while process.is_alive():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                process.terminate()
+                process.join()
+                raise IngestError("parse timed out")
+            process.join(timeout=min(0.1, remaining))
+        return message
 
 
 def parse_pdf(path: Path, max_pages: int = 300, timeout_s: int = 300) -> list[Block]:

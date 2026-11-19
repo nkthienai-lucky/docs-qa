@@ -4,7 +4,7 @@ Label: **held-out headline; dev, optimistic**
 
 Default configuration: `v2a`
 
-The runtime/API/UI default is V2a (dense candidates plus cross-encoder reranking), selected from the held-out rerun; V1 remains explicitly supported and V2b variants remain comparison configurations.
+The runtime/API/UI default is V2a (dense candidates plus cross-encoder reranking), predeclared from dev tuning with the primary judge before held-out execution; the held-out rerun is reported as confirmation. V1 remains explicitly supported and V2b variants remain comparison configurations.
 
 This is a post-interruption rerun of the held-out execution, not a pristine first-pass held-out benchmark; the limitation is retained in the evaluation ledger.
 

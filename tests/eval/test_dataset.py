@@ -15,7 +15,6 @@ from docsqa.eval.dataset import (
     verify_split,
 )
 
-
 CATEGORIES = ("fact", "reasoning", "multi_chunk", "rare_keyword", "out_of_scope")
 
 

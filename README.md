@@ -5,9 +5,9 @@ A local, handwritten document-question-answering project with page-aware citatio
 ## Status
 
 - Stage 3 implementation, evaluation, security sweep, and UI are complete for the current local deployment scope.
-- Runtime/API/UI default retrieval is **V2a (dense candidates + cross-encoder reranking)**, selected from the completed protocol-v2 GPU/API rerun. Explicit `config="v1"`, `v2b`, or `v2b_norerank` remains supported for comparison and compatibility.
+- Runtime/API/UI default retrieval is **V2a (dense candidates + cross-encoder reranking)**, predeclared from dev tuning with the primary judge before held-out execution. Explicit `config="v1"`, `v2b`, or `v2b_norerank` remains supported for comparison and compatibility.
 - The final evaluation report is [eval/protocol-v2/report-final-rerun-gpu-api/](eval/protocol-v2/report-final-rerun-gpu-api/). It is a full rerun after an interrupted held-out attempt, not a pristine first-pass held-out run; this limitation is recorded in the report and ledger.
-- Stage 3 verification: full GPU rerun 80/80 results, API judge 72/72 in-scope samples, `160 passed`, Ruff clean, and `git diff --check` clean.
+- Stage 3 verification: full GPU rerun 80/80 results, API judge 72/72 in-scope samples, `166 passed`, Ruff clean, and `git diff --check` clean.
 - No deployment is configured; services are intended for loopback-only use.
 
 ## Architecture
@@ -45,7 +45,7 @@ The API can be started with `uv run python -c 'from docsqa.api import serve; ser
 - Run `uv run pytest tests/eval -q` to validate eval code. The evaluation runner is programmatic; see `src/docsqa/eval/runner.py` and `src/docsqa/eval/report.py`.
 - Tuning uses dev only, at most three rounds; configurations must share final `top_k` and prompt hash. Held-out must only be run once at the end and requires all four protocol configurations.
 - The local judge uses Ollama. The API judge is optional and eval-only. Do not send corpus excerpts to a third-party gateway until the corpus license and gateway retention/privacy terms are explicitly confirmed. Credentials must remain in local environment settings, never logs or result metadata.
-- Report only measured values. The reference markers are faithfulness 0.8 and context recall 0.7; they are not claims that this project has achieved them.
+- Report only measured values. The reference markers are faithfulness > 0.8 and context recall > 0.7; they are not claims that this project has achieved them.
 
 ## Citation and safety contract
 

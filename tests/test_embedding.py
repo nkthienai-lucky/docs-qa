@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+from typing import Self
 
 import pytest
 
@@ -16,7 +17,7 @@ class _FakeResponse:
     def read(self) -> bytes:
         return json.dumps(self._payload).encode("utf-8")
 
-    def __enter__(self) -> _FakeResponse:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *args: object) -> bool:
@@ -51,8 +52,8 @@ def test_query_gets_instruction_documents_do_not(monkeypatch: pytest.MonkeyPatch
     assert query_call["body"] == {
         "model": "qwen3-embedding:0.6b",
         "input": [
-            "Instruct: Given a web search query, retrieve relevant passages\n"
-            "Query: cách cài đặt OCR"
+            ("Instruct: Given a web search query, retrieve relevant passages\n"
+            "Query: cách cài đặt OCR")
         ],
     }
     assert documents_call["body"]["input"] == ["văn bản thứ nhất", "văn bản thứ hai"]

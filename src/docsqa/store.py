@@ -59,7 +59,7 @@ class VectorStore:
     def ensure_schema(self) -> None:
         dim = self.embedder_meta.dim
         if not isinstance(dim, int) or isinstance(dim, bool):
-            raise ValueError("embedder_meta.dim must be an int")
+            raise TypeError("embedder_meta.dim must be an int")
         conn = self._connection()
         conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
         conn.execute(

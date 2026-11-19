@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import time
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,10 @@ from docsqa.parse import (
 
 def _put_large_payload(queue) -> None:
     queue.put(("ok", [("text", 1, None)] * 20_000, 1))
+
+
+def _crash_worker(queue) -> None:
+    raise RuntimeError("unexpected parser failure")
 
 
 def _write_minimal_pdf(path: Path, pages: int = 3) -> None:
@@ -47,7 +52,20 @@ def test_collect_worker_result_drains_large_payload_before_join() -> None:
     assert not process.is_alive()
 
 
-def test_pipeline_options_use_cuda_when_available() -> None:
+def test_collect_worker_result_reports_crashed_worker_promptly() -> None:
+    context = mp.get_context("spawn")
+    queue = context.Queue()
+    process = context.Process(target=_crash_worker, args=(queue,))
+    process.start()
+    started = time.monotonic()
+
+    with pytest.raises(IngestError, match="parser worker exited"):
+        _collect_worker_result(process, queue, timeout_s=10)
+
+    assert time.monotonic() - started < 5
+    assert not process.is_alive()
+
+
     options = pipeline_options()
 
     import torch

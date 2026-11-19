@@ -79,8 +79,8 @@ def test_bm25_idf_downweights_common_syllables() -> None:
 
 
 def test_bm25_refreshes_store_snapshot_when_document_set_changes() -> None:
-    from docsqa.chunking import Chunk
     from docsqa.bm25 import BM25Index
+    from docsqa.chunking import Chunk
     from docsqa.store import DocumentInfo
 
     class Store:

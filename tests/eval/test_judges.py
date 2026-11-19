@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import math
 from pathlib import Path
 
 import pytest
@@ -44,7 +43,53 @@ def test_judge_exception_message_contains_no_token_or_base_url(monkeypatch) -> N
     assert "private.test" not in str(error.value)
 
 
-def test_api_judge_requires_token_and_fails_clearly_without_it() -> None:
+
+
+def test_api_failures_are_sanitized_as_judge_error(monkeypatch) -> None:
+    class ProviderError(Exception):
+        pass
+
+    def fail(*args, **kwargs):
+        raise ProviderError("request failed for https://private.test with token secret-token")
+
+    monkeypatch.setattr("docsqa.eval.judges._score_ragas", fail)
+    from docsqa.eval.judges import JudgeError
+
+    with pytest.raises(JudgeError) as error:
+        score_samples(
+            [Sample("q", "a", ["c"], "g")],
+            JudgeConfig("api", "api", "m"),
+            Settings(),
+        )
+
+    assert "secret-token" not in str(error.value)
+    assert "private.test" not in str(error.value)
+
+
+def test_judge_cache_includes_embedding_identity(monkeypatch, tmp_path: Path) -> None:
+    calls = 0
+
+    def fake_evaluate(samples, cfg, settings):
+        nonlocal calls
+        calls += 1
+        return [{"faithfulness": 0.8}]
+
+    monkeypatch.setattr("docsqa.eval.judges._score_ragas", fake_evaluate)
+    monkeypatch.setattr("docsqa.eval.judges._JUDGE_CACHE_DIR", tmp_path)
+    samples = [Sample("q", "a", ["context"], "truth")]
+    first = score_samples(
+        samples,
+        JudgeConfig("api", "api", "judge-model"),
+        Settings(embed_model="embed-a"),
+    )
+    second = score_samples(
+        samples,
+        JudgeConfig("api", "api", "judge-model"),
+        Settings(embed_model="embed-b"),
+    )
+
+    assert first == second
+    assert calls == 2
     with pytest.raises(ValueError, match="token"):
         from docsqa.eval.judges import make_ragas_llm
         make_ragas_llm(
@@ -97,23 +142,17 @@ def test_ragas_embeddings_use_the_project_ollama_embedder(monkeypatch) -> None:
             captured.update(kwargs)
 
         def embed_documents(self, texts):
-            return []
+            return [[0.1, 0.2] for _ in texts]
 
         def embed_query(self, text):
             return []
 
-    class FakeWrapper:
-        def __init__(self, embeddings):
-            self.embeddings = embeddings
-
     monkeypatch.setattr("docsqa.eval.judges.OllamaEmbedder", FakeEmbedder)
-    monkeypatch.setattr("ragas.embeddings.LangchainEmbeddingsWrapper", FakeWrapper)
-
     from docsqa.eval.judges import make_ragas_embeddings
 
     wrapper = make_ragas_embeddings(Settings(ollama_host="http://ollama.local", embed_model="qwen-test"))
 
-    assert isinstance(wrapper.embeddings, object)
+    assert wrapper.embed_text("test") == [0.1, 0.2]
     assert captured == {
         "host": "http://ollama.local",
         "model": "qwen-test",

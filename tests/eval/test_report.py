@@ -284,6 +284,53 @@ def test_default_config_falls_back_to_v1_when_intervals_overlap():
     scores = {"primary": [SampleScores(0.8, 0.8, 0.8, 0.8) for _ in results]}
     report = build_report(results, [], "primary", scores=scores)
     assert report.default_config == "v1"
+
+
+def test_default_config_uses_primary_judge_dev_comparisons_with_one_judge():
+    results = []
+    for index in range(20):
+        baseline = sample(str(index), "fact", "dev", False, 1)
+        improved = SampleResult(
+            **{
+                **sample(str(index), "fact", "dev", False, 1).__dict__,
+                "config": "v2a",
+            }
+        )
+        results.extend((baseline, improved))
+    scores = {
+        "api": [
+            score
+            for _ in range(20)
+            for score in (
+                SampleScores(0.6, 0.6, 0.6, 0.6),
+                SampleScores(0.9, 0.9, 0.9, 0.9),
+            )
+        ]
+    }
+
+    report = build_report(
+        results,
+        [],
+        "api",
+        scores=scores,
+        configs={"v1": "v1", "v2a": "v2a"},
+    )
+
+    assert report.default_config == "v2a"
+
+
+def test_default_config_selection_uses_dev_not_held_out():
+    dev = [sample(str(index), "fact", "dev", False, 1) for index in range(20)]
+    held_out = [sample(str(index), "fact", "held_out", False, 1) for index in range(20)]
+    scores = {
+        "api": [SampleScores(0.8, 0.8, 0.8, 0.8) for _ in dev + held_out]
+    }
+
+    report = build_report(dev, held_out, "api", scores=scores)
+
+    assert report.default_config == "v1"
+
+
 def test_report_files_contain_no_secret_values_or_gateway_host(tmp_path: Path):
     results = [sample("q1", "fact", "dev", False, 1)]
     report = build_report(results, [], "primary")

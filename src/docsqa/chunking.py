@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 from .corpus import normalize_text
 
@@ -66,7 +66,7 @@ def chunk_blocks(
         # The public token counter may be a model tokenizer. The built-in
         # window uses whitespace tokens, and validates the resulting text with
         # the supplied counter before accepting it.
-        step = size - overlap
+        size - overlap
         start = 0
         while start < len(token_pages):
             end = min(len(token_pages), start + size)

@@ -110,7 +110,7 @@ def test_citations_resolve_to_retrieved_chunks_and_excerpts() -> None:
     generator = FakeGenerator("First claim [2]. Second claim [1].")
     pipeline = _pipeline(store, embedder, generator)
 
-    response = pipeline.ask(question)
+    response = pipeline.ask(question, config="v1")
 
     assert isinstance(response, AnswerResponse)
     assert response.answer == "First claim [2]. Second claim [1]."
@@ -152,13 +152,87 @@ def test_citations_resolve_to_retrieved_chunks_and_excerpts() -> None:
     assert "the  vocabulary" not in user
 
 
+def test_generation_k_limits_prompt_but_keeps_retrieval_snapshot() -> None:
+    store, embedder = FakeStore(), FakeEmbedder()
+    question = "what does the vocabulary unit cover?"
+    qvec = [1.0, 0.0, 0.0, 0.0]
+    embedder.learn(question, qvec)
+    for ordinal in range(3):
+        store.index(_chunk(ordinal, f"evidence {ordinal}"), qvec, 0.9 - ordinal * 0.1)
+    generator = FakeGenerator("Answer [1]")
+    pipeline = Pipeline(
+        {"v1": VectorRetriever(store, embedder, top_k=10)},
+        generator,
+        final_k=3,
+        generation_k=1,
+    )
+
+    response = pipeline.ask(question, config="v1")
+
+    assert response.retrieval.candidates == ["doc:0", "doc:1", "doc:2"]
+    assert [citation.chunk_id for citation in response.citations] == ["doc:0"]
+    assert generator.calls[0][-1]["content"].count("<context id=") == 1
+
+
+def test_pipeline_default_config_is_v2a() -> None:
+    store, embedder = FakeStore(), FakeEmbedder()
+    question = "what does the vocabulary unit cover?"
+    qvec = [1.0, 0.0, 0.0, 0.0]
+    embedder.learn(question, qvec)
+    store.index(_chunk(0, "Evidence"), qvec, 0.9)
+    generator = FakeGenerator("Answer [1]")
+    pipeline = Pipeline(
+        {
+            "v1": VectorRetriever(store, embedder, top_k=5),
+            "v2a": VectorRetriever(store, embedder, top_k=5),
+        },
+        generator,
+        final_k=5,
+        generation_k=1,
+    )
+
+    response = pipeline.ask(question)
+
+    assert response.retrieval.configuration == "v2a"
+
+
+def test_single_generation_context_without_citation_remains_uncited() -> None:
+    store, embedder = FakeStore(), FakeEmbedder()
+    question = "what does this phrase mean?"
+    qvec = [1.0, 0.0, 0.0, 0.0]
+    embedder.learn(question, qvec)
+    store.index(_chunk(0, "It means to enjoy something."), qvec, 0.9)
+    generator = FakeGenerator("It means to enjoy something.")
+    pipeline = Pipeline(
+        {"v1": VectorRetriever(store, embedder, top_k=5)},
+        generator,
+        final_k=5,
+        generation_k=1,
+    )
+
+    response = pipeline.ask(question, config="v1")
+
+    assert response.answer == "It means to enjoy something."
+    assert response.citations == []
+
+
+def test_generation_k_must_not_exceed_final_k() -> None:
+    generator = FakeGenerator("unused")
+    try:
+        Pipeline({}, generator, final_k=2, generation_k=3)
+    except ValueError as error:
+        assert "generation_k" in str(error)
+    else:
+        raise AssertionError("generation_k greater than final_k should fail")
+
+
 def test_empty_index_returns_abstention_without_calling_generator() -> None:
     store, embedder = FakeStore(), FakeEmbedder()
     embedder.learn("any question at all", [0.0, 1.0, 0.0, 0.0])
     generator = FakeGenerator("should never be produced [1]")
     pipeline = _pipeline(store, embedder, generator)
 
-    response = pipeline.ask("any question at all")
+    response = pipeline.ask("any question at all", config="v1")
 
     assert response.abstained is True
     assert response.answer == ABSTAIN
@@ -174,7 +248,7 @@ def test_empty_or_whitespace_question_returns_abstention() -> None:
     pipeline = _pipeline(store, embedder, generator)
 
     for question in ("", "   ", " \n\t "):
-        response = pipeline.ask(question)
+        response = pipeline.ask(question, config="v1")
         assert response.abstained is True
         assert response.answer == ABSTAIN
         assert response.citations == []
@@ -201,7 +275,7 @@ def test_diacritic_less_and_nfd_query_hit_same_chunk_as_nfc() -> None:
     assert nfd != nfc  # the variants really differ
     bare = "cau hoi ve gdp cua viet nam"
 
-    responses = [pipeline.ask(question) for question in (nfc, nfd, bare)]
+    responses = [pipeline.ask(question, config="v1") for question in (nfc, nfd, bare)]
 
     for response in responses:
         assert response.abstained is False

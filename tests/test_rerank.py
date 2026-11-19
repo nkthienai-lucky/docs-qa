@@ -4,7 +4,7 @@ import numpy
 import pytest
 
 from docsqa.chunking import Chunk
-from docsqa.rerank import Reranker
+from docsqa.rerank import Reranker, _resolve_device
 from docsqa.store import Hit
 
 
@@ -29,17 +29,15 @@ class FakeCrossEncoder:
     def __init__(self, scores: dict[str, float]) -> None:
         self._scores = scores
         self.pairs: list[tuple[str, str]] = []
+        self.kwargs: dict[str, object] = {}
 
     def predict(self, pairs, **kwargs):
         self.pairs.extend(pairs)
+        self.kwargs.update(kwargs)
         return numpy.array([self._scores[text] for _, text in pairs])
 
 
 def test_reranker_reorders_by_cross_encoder_score() -> None:
-    # Vector order (by retrieval score) puts the filler chunk first; the
-    # cross-encoder scores put the relevant chunk first. Reranking must
-    # reorder by cross-encoder score, keep non-negative scores, and attach
-    # the score to the returned Hits.
     fake = FakeCrossEncoder(
         {
             "filler about classrooms and pencils": 0.01,
@@ -47,10 +45,10 @@ def test_reranker_reorders_by_cross_encoder_score() -> None:
             "a third unrelated passage about weather": 0.30,
         }
     )
-    reranker = Reranker.__new__(Reranker)  # skip model load
+    reranker = Reranker.__new__(Reranker)
     reranker.model = fake
     reranker.device = "cpu"
-
+    reranker.batch_size = 32
     hits = [
         _hit(0, "filler about classrooms and pencils", score=0.61),
         _hit(1, "lend means to give something temporarily", score=0.50),
@@ -61,20 +59,20 @@ def test_reranker_reorders_by_cross_encoder_score() -> None:
 
     assert [hit.chunk.chunk_id for hit in reranked] == ["doc:1", "doc:2"]
     assert [hit.score for hit in reranked] == [0.95, 0.30]
-    # The model saw (query, passage) pairs for every candidate.
     assert fake.pairs == [
         ("what does lend mean?", "filler about classrooms and pencils"),
         ("what does lend mean?", "lend means to give something temporarily"),
         ("what does lend mean?", "a third unrelated passage about weather"),
     ]
+    assert fake.kwargs["batch_size"] == 32
 
 
-def test_reranker_runs_on_cpu_by_default() -> None:
-    # The device must default to CPU and be passed through to CrossEncoder.
-    # We patch CrossEncoder in docsqa.rerank to capture the kwargs without
-    # loading weights.
+def test_reranker_device_batch_defaults_and_overrides(monkeypatch) -> None:
+    import torch
+
     import docsqa.rerank as rerank_module
 
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
     captured: dict[str, object] = {}
 
     class RecordingCrossEncoder:
@@ -82,16 +80,39 @@ def test_reranker_runs_on_cpu_by_default() -> None:
             captured["model"] = model
             captured.update(kwargs)
 
-    original = rerank_module.CrossEncoder
-    rerank_module.CrossEncoder = RecordingCrossEncoder
-    try:
-        reranker = Reranker()
-    finally:
-        rerank_module.CrossEncoder = original
+    monkeypatch.setattr(rerank_module, "CrossEncoder", RecordingCrossEncoder)
+    cpu_reranker = Reranker(device="cpu")
+    cuda_reranker = Reranker(device="cuda")
+    overridden = Reranker(device="cuda", batch_size=4)
 
-    assert reranker.device == "cpu"
+    assert cpu_reranker.device == "cpu"
+    assert cpu_reranker.batch_size == 32
+    assert cuda_reranker.device == "cuda"
+    assert cuda_reranker.batch_size == 2
+    assert overridden.batch_size == 4
     assert captured["model"] == "BAAI/bge-reranker-v2-m3"
-    assert captured["device"] == "cpu"
+    assert captured["device"] == "cuda"
+
+
+def test_reranker_auto_device_falls_back_to_cpu(monkeypatch) -> None:
+    import torch
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    assert _resolve_device("auto") == "cpu"
+    with pytest.raises(ValueError, match="CUDA requested"):
+        _resolve_device("cuda")
+
+
+def test_reranker_auto_device_selects_cuda(monkeypatch) -> None:
+    import torch
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    assert _resolve_device("auto") == "cuda"
+
+
+def test_reranker_rejects_invalid_batch_size() -> None:
+    with pytest.raises(ValueError, match="batch_size"):
+        Reranker(batch_size=0)
 
 
 def test_rerank_preserves_hit_chunks_and_truncates_to_top_k() -> None:
@@ -99,6 +120,7 @@ def test_rerank_preserves_hit_chunks_and_truncates_to_top_k() -> None:
     reranker = Reranker.__new__(Reranker)
     reranker.model = fake
     reranker.device = "cpu"
+    reranker.batch_size = 32
     original = [
         _hit(0, "a", score=0.9),
         _hit(1, "b", score=0.8),

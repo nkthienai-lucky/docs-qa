@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import copy
 import hashlib
 import json
 import logging
 import math
-from pathlib import Path
 import re
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Literal
-
-from pydantic import SecretStr
 
 from ..embedding import OllamaEmbedder
 from ..settings import Settings
@@ -61,94 +60,122 @@ def _raise_http_loggers() -> None:
 
 
 def make_ragas_llm(cfg: JudgeConfig, settings: Settings):
-    """Build a Ragas-compatible LangChain wrapper from configured judge settings."""
-    from ragas.llms import LangchainLLMWrapper
+    """Build a Ragas 0.4 Instructor LLM over an OpenAI-compatible endpoint."""
+    from openai import OpenAI
+    from ragas.llms import llm_factory
 
     if cfg.kind == "local":
-        from langchain_community.chat_models import ChatOllama
-
-        llm = ChatOllama(
-            base_url=settings.ollama_host,
-            model=cfg.model,
-            temperature=cfg.temperature,
-            num_ctx=settings.num_ctx,
-            format="json",
-            model_kwargs={"think": False},
-        )
+        base_url = settings.ollama_host.rstrip("/") + "/v1"
+        api_key = "ollama-local"
     elif cfg.kind == "api":
-        base_url = settings.api_judge_base_url.get_secret_value() if settings.api_judge_base_url else None
-        token = settings.api_judge_token.get_secret_value() if settings.api_judge_token else None
-        if not token:
+        base_url = (
+            settings.api_judge_base_url.get_secret_value()
+            if settings.api_judge_base_url
+            else None
+        )
+        api_key = (
+            settings.api_judge_token.get_secret_value()
+            if settings.api_judge_token
+            else None
+        )
+        if not api_key:
             raise ValueError("API judge token is required")
         if not base_url:
             raise ValueError("API judge base URL is required")
         if not settings.api_judge_model:
             raise ValueError("API judge model is required")
-        from langchain_openai import ChatOpenAI
-
-        llm = ChatOpenAI(
-            base_url=base_url,
-            api_key=SecretStr(token),
-            model=settings.api_judge_model,
-            temperature=cfg.temperature,
-            timeout=900,
-            max_retries=1,
-        )
     else:
         raise ValueError(f"unsupported judge kind: {cfg.kind}")
-    return LangchainLLMWrapper(llm)
+
+    client = OpenAI(
+        base_url=base_url,
+        api_key=api_key,
+        timeout=900,
+        max_retries=1,
+    )
+    return llm_factory(
+        model=cfg.model,
+        provider="openai",
+        client=client,
+        temperature=cfg.temperature,
+        max_tokens=2048,
+        extra_body={"think": False},
+    )
 
 
 def make_ragas_embeddings(settings: Settings):
-    from langchain_core.embeddings import Embeddings
-    from ragas.embeddings import LangchainEmbeddingsWrapper
+    from ragas.embeddings.base import BaseRagasEmbedding
 
-    class _ProjectEmbedderAdapter(Embeddings):
+    class _ProjectRagasEmbedding(BaseRagasEmbedding):
         def __init__(self) -> None:
+            super().__init__()
             self.embedder = OllamaEmbedder(
                 host=settings.ollama_host,
                 model=settings.embed_model,
                 query_instruction="Given a web search query, retrieve relevant passages",
             )
 
-        def embed_documents(self, texts: list[str]) -> list[list[float]]:
-            return self.embedder.embed_documents(texts)
+        def embed_text(self, text: str, **kwargs: Any) -> list[float]:
+            return self.embedder.embed_documents([text])[0]
+
+        async def aembed_text(self, text: str, **kwargs: Any) -> list[float]:
+            return self.embed_text(text, **kwargs)
 
         def embed_query(self, text: str) -> list[float]:
             return self.embedder.embed_query(text)
 
-    return LangchainEmbeddingsWrapper(_ProjectEmbedderAdapter())
+        async def aembed_query(self, text: str) -> list[float]:
+            return self.embed_query(text)
+
+        def embed_documents(self, texts: list[str]) -> list[list[float]]:
+            return self.embedder.embed_documents(texts)
+
+        async def aembed_documents(self, texts: list[str]) -> list[list[float]]:
+            return self.embed_documents(texts)
+
+    return _ProjectRagasEmbedding()
 
 
 def _score_ragas(
     samples: list[Sample], cfg: JudgeConfig, settings: Settings
 ) -> list[dict[str, float | None]]:
-    from datasets import Dataset
-    from ragas import evaluate
-    from ragas.metrics.collections import (
-        AnswerRelevancy,
-        ContextPrecision,
-        ContextRecall,
-        Faithfulness,
+    from ragas import EvaluationDataset, SingleTurnSample, evaluate
+    from ragas.metrics import (
+        answer_relevancy as answer_relevancy_template,
+    )
+    from ragas.metrics import (
+        context_precision as context_precision_template,
+    )
+    from ragas.metrics import (
+        context_recall as context_recall_template,
+    )
+    from ragas.metrics import (
+        faithfulness as faithfulness_template,
     )
     from ragas.run_config import RunConfig as RagasRunConfig
 
     llm = make_ragas_llm(cfg, settings)
     embeddings = make_ragas_embeddings(settings)
     metrics = [
-        Faithfulness(llm=llm),
-        AnswerRelevancy(llm=llm, embeddings=embeddings),
-        ContextPrecision(llm=llm),
-        ContextRecall(llm=llm),
+        copy.deepcopy(faithfulness_template),
+        copy.deepcopy(answer_relevancy_template),
+        copy.deepcopy(context_precision_template),
+        copy.deepcopy(context_recall_template),
     ]
-    dataset = Dataset.from_list(
-        [
-            {
-                "user_input": sample.question,
-                "response": sample.answer,
-                "retrieved_contexts": sample.contexts,
-                "reference": sample.ground_truth,
-            }
+    for metric in metrics:
+        metric.llm = llm
+        if hasattr(metric, "max_retries"):
+            metric.max_retries = 0
+    metrics[1].strictness = 1
+    metrics[1].embeddings = embeddings
+    dataset = EvaluationDataset(
+        samples=[
+            SingleTurnSample(
+                user_input=sample.question,
+                response=sample.answer,
+                retrieved_contexts=sample.contexts,
+                reference=sample.ground_truth,
+            )
             for sample in samples
         ]
     )
@@ -177,17 +204,19 @@ def _finite_score(value: Any) -> float | None:
 def _safe_error_message(error: Exception, settings: Settings) -> str:
     message = str(error)
     forbidden = [
-        settings.api_judge_token.get_secret_value()
-        if settings.api_judge_token
-        else "",
+        settings.api_judge_token.get_secret_value() if settings.api_judge_token else "",
         settings.api_judge_base_url.get_secret_value()
         if settings.api_judge_base_url
         else "",
     ]
     for value in forbidden:
         if value:
-            message = re.sub(re.escape(value), "[redacted]", message, flags=re.IGNORECASE)
-    message = re.sub(r"https?://\S+", "[endpoint redacted]", message, flags=re.IGNORECASE)
+            message = re.sub(
+                re.escape(value), "[redacted]", message, flags=re.IGNORECASE
+            )
+    message = re.sub(
+        r"https?://\S+", "[endpoint redacted]", message, flags=re.IGNORECASE
+    )
     message = re.sub(
         r"(?i)\b(?:bearer\s+)?(?:token|api[_ -]?key)\s*[:=]?\s*\S+",
         "[credential redacted]",
@@ -196,9 +225,19 @@ def _safe_error_message(error: Exception, settings: Settings) -> str:
     return message[:500]
 
 
-def _cache_path(samples: list[Sample], cfg: JudgeConfig) -> Path:
+def _cache_path(samples: list[Sample], cfg: JudgeConfig, settings: Settings) -> Path:
+    embedder_identity = hashlib.sha256(
+        f"{settings.ollama_host}\0{settings.embed_model}".encode()
+    ).hexdigest()
     payload = {
-        "judge": {"name": cfg.name, "kind": cfg.kind, "model": cfg.model, "temperature": cfg.temperature},
+        "cache_schema": 3,
+        "judge": {
+            "name": cfg.name,
+            "kind": cfg.kind,
+            "model": cfg.model,
+            "temperature": cfg.temperature,
+        },
+        "embedder_identity": embedder_identity,
         "samples": [
             {
                 "question": sample.question,
@@ -223,7 +262,7 @@ def score_samples(
     _raise_http_loggers()
     if not samples:
         return []
-    cache_path = _cache_path(samples, cfg)
+    cache_path = _cache_path(samples, cfg, settings)
     if cache_path.exists():
         try:
             rows = json.loads(cache_path.read_text(encoding="utf-8"))
@@ -241,7 +280,7 @@ def score_samples(
             ]
     try:
         rows = _score_ragas(samples, cfg, settings)
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - provider SDKs expose heterogeneous exception classes
         raise JudgeError(
             f"judge scoring failed for {cfg.name}: {_safe_error_message(error, settings)}"
         ) from None
@@ -274,7 +313,10 @@ def agreement_with_labels(
     if len(scores) != len(by_id):
         raise ValueError("scores and human labels must have equal lengths")
     pairs = list(zip(scores, by_id.values()))
-    if any(score.faithfulness is None or not math.isfinite(score.faithfulness) for score, _ in pairs):
+    if any(
+        score.faithfulness is None or not math.isfinite(score.faithfulness)
+        for score, _ in pairs
+    ):
         raise ValueError("faithfulness scores must be finite to calculate agreement")
     predicted = [score.faithfulness >= 0.5 for score, _ in pairs]
     actual = [faithful for _, faithful in pairs]

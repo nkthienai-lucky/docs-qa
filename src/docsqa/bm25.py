@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import itertools
 import unicodedata
 from dataclasses import dataclass
 
 from rank_bm25 import BM25Okapi
 
 from .chunking import Chunk
-from .corpus import normalize_text, strip_accents
+from .corpus import strip_accents
 
 
 def tokenize_vi(text: str) -> list[str]:
@@ -37,7 +38,7 @@ def tokenize_vi(text: str) -> list[str]:
     for accented, bare in zip(raw_tokens, stripped):
         tokens.append(accented)
         tokens.append(bare)
-    for left, right in zip(stripped, stripped[1:]):
+    for left, right in itertools.pairwise(stripped):
         tokens.append(f"{left}_{right}")
     return tokens
 
@@ -59,7 +60,7 @@ class BM25Index:
     _store_signature: tuple[tuple[str, int], ...] | None = None
 
     @classmethod
-    def build(cls, chunks: list[Chunk]) -> "BM25Index":
+    def build(cls, chunks: list[Chunk]) -> BM25Index:
         tokenized_corpus = [tokenize_vi(chunk.text) for chunk in chunks]
         bm25 = BM25Okapi(tokenized_corpus)
         return cls(
@@ -72,7 +73,7 @@ class BM25Index:
     @classmethod
     def from_store(
         cls, store, doc_ids: list[str] | None = None
-    ) -> "BM25Index":
+    ) -> BM25Index:
         """Build an index snapshot from a store and remember its doc signature."""
         chunks = store.all_chunks(doc_ids)
         index = cls.build(chunks)
@@ -89,7 +90,7 @@ class BM25Index:
 
     def refresh_from_store(
         self, store, doc_ids: list[str] | None = None
-    ) -> "BM25Index":
+    ) -> BM25Index:
         """Rebuild and replace this index if the selected document set changed."""
         docs = store.list_documents()
         selected = set(doc_ids) if doc_ids is not None else None

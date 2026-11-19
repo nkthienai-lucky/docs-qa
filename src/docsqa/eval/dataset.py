@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from collections import Counter
-from dataclasses import dataclass
 import hashlib
 import json
+from collections import Counter
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
-
 
 Category = Literal["fact", "reasoning", "multi_chunk", "rare_keyword", "out_of_scope"]
 Split = Literal["dev", "held_out"]

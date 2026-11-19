@@ -85,18 +85,23 @@ class Pipeline:
         retrievers: dict[str, Retriever],
         generator,
         final_k: int = 5,
+        generation_k: int | None = None,
     ) -> None:
         if final_k <= 0:
             raise ValueError("final_k must be positive")
+        if generation_k is not None and not 0 < generation_k <= final_k:
+            raise ValueError("generation_k must be between 1 and final_k")
         self.retrievers = retrievers
         self.generator = generator
         self.final_k = final_k
+        self.generation_k = generation_k or final_k
 
     def ask(
         self,
         question: str,
-        config: str = "v1",
+        config: str = "v2a",
         doc_ids: list[str] | None = None,
+        hits: list[Hit] | None = None,
     ) -> AnswerResponse:
         if config not in self.retrievers:
             raise KeyError(f"unknown retrieval configuration: {config}")
@@ -104,21 +109,27 @@ class Pipeline:
         if not normalized_question:
             return _abstain(config)
 
-        hits = self.retrievers[config].retrieve(
-            normalized_question, doc_ids
-        )[: self.final_k]
+        if hits is None:
+            hits = self.retrievers[config].retrieve(normalized_question, doc_ids)[
+                : self.final_k
+            ]
+        elif len(hits) > self.final_k:
+            raise ValueError("provided hits cannot exceed final_k")
         if not hits:
             return _abstain(config)
 
-        messages = build_messages(normalized_question, hits)
+        generation_hits = hits[: self.generation_k]
+        messages = build_messages(normalized_question, generation_hits)
         raw = self.generator.generate(messages)
-        parsed = parse_answer(raw, n_contexts=len(hits))
+        parsed = parse_answer(raw, n_contexts=len(generation_hits))
         if parsed.abstained:
             return _abstain(config, hits)
 
-        citations = [_citation(hits[index - 1]) for index in parsed.cited]
+        cited_indices = parsed.cited
+        answer = parsed.text
+        citations = [_citation(generation_hits[index - 1]) for index in cited_indices]
         return AnswerResponse(
-            answer=parsed.text,
+            answer=answer,
             abstained=False,
             citations=citations,
             retrieval=RetrievalInfo(

@@ -4,7 +4,6 @@ import random
 from statistics import mean
 from typing import Literal
 
-
 Verdict = Literal["better", "worse", "no_detectable_difference"]
 
 
