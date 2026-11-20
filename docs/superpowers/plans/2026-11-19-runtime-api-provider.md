@@ -1,6 +1,6 @@
 # Runtime API Providers and Render Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. No subagent execution tools are available in the current harness.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking. No subagent execution tools are available in the current harness.
 
 **Goal:** Implement local mixed-provider and cloud three-API inference, preserving V2a and preparing API-only Render infrastructure without publishing a service.
 
@@ -60,10 +60,10 @@ Every task below has its own failing-test gate and green regression gate. Tests 
 - Protocols `Generator.generate(messages: list[dict[str,str]]) -> str`, `RuntimeReranker.rerank(query: str, hits: list[Hit], top_k: int) -> list[Hit]`; dataclass `RuntimeComponents(generator: Generator, embedder: Embedder, reranker: RuntimeReranker)`.
 - No component factory until Task 5. Use `TYPE_CHECKING` where appropriate to avoid importing local ML providers.
 
-- [ ] Write `test_runtime_defaults_are_local`, `test_local_provider_choices_are_independent`, `test_cloud_requires_three_explicit_api_providers`, `test_cloud_rejects_each_incomplete_api`, `test_runtime_never_uses_judge_credentials`, `test_cloud_ignores_unused_ollama_variables`, `test_runtime_errors_hide_input_values`. Assert exact settings/defaults from spec, reject blank/control-character model/token values, HTTPS violations, relative cloud upload path, and timeout values 0/NaN/Infinity/121. Existing Ollama/eval settings must remain unchanged. Validating settings must perform no HTTP or provider construction.
-- [ ] Run `uv run pytest tests/test_runtime.py tests/test_settings.py -q`. Expected: new missing-symbol/validation assertions fail, not external-service errors.
-- [ ] Implement spec settings table and protocols; `SecretStr` token/base URLs; enum/Literal selectors; hide input values in rendered validation errors. Add selected-provider URL policy validation locally in Task 1, then share canonical policy with Task 2 without relaxing it.
-- [ ] Run the same command. Expected: all pass. Record commands/results and Task 1 completion in ledger.
+- [x] Write `test_runtime_defaults_are_local`, `test_local_provider_choices_are_independent`, `test_cloud_requires_three_explicit_api_providers`, `test_cloud_rejects_each_incomplete_api`, `test_runtime_never_uses_judge_credentials`, `test_cloud_ignores_unused_ollama_variables`, `test_runtime_errors_hide_input_values`. Assert exact settings/defaults from spec, reject blank/control-character model/token values, HTTPS violations, relative cloud upload path, and timeout values 0/NaN/Infinity/121. Existing Ollama/eval settings must remain unchanged. Validating settings must perform no HTTP or provider construction.
+- [x] Run `uv run pytest tests/test_runtime.py tests/test_settings.py -q`. Expected: new missing-symbol/validation assertions fail, not external-service errors.
+- [x] Implement spec settings table and protocols; `SecretStr` token/base URLs; enum/Literal selectors; hide input values in rendered validation errors. Add selected-provider URL policy validation locally in Task 1, then share canonical policy with Task 2 without relaxing it.
+- [x] Run the same command. Expected: all pass. Record commands/results and Task 1 completion in ledger.
 
 ### Task 2: Safe HTTP transport and generation
 
@@ -74,11 +74,11 @@ Every task below has its own failing-test gate and green regression gate. Tests 
 - `post_json(url: str, token: str, payload: dict, timeout: float) -> dict`; fixed `ProviderHTTPError`, no raw exception chain. Module-level `open_provider_request(request, timeout)` is injectable, production implementation uses a redirect-denying urllib opener.
 - `OpenAICompatibleGenerator(host: str, model: str, token: str, timeout: float = 30.0, max_tokens: int = 256)`; existing `GeneratorError`.
 
-- [ ] Write transport tests: root→`/v1`, existing `/v1`, `/gateway/v1`, trailing slash, recognized same/cross endpoint suffixes, rejected userinfo/query/fragment/control characters, denied 301/302/307/308, non-object/malformed/NaN JSON, oversize 8 MiB+1 body, HTTP/timeout errors. Use a fake opener; inspect actual Request headers/body/method and bounded read size. Capture formatted traceback/stdout/stderr to assert sentinel token/URL/body absent and sanitized exception has no cause/context.
-- [ ] Write generation tests asserting exact model/messages/temperature=0/stream=false/max_tokens payload, valid content/citation preservation, blank content and malformed envelopes rejected, fixed sanitized `GeneratorError` for HTTP and parse failures.
-- [ ] Run `uv run pytest tests/test_provider_http.py tests/test_generation.py -q`. Expected: new transport/adapter tests fail before implementation.
-- [ ] Implement transport and generator, reusing shared URL validation in runtime. Never log/re-raise raw provider exceptions. Retain existing Ollama behavior.
-- [ ] Run `uv run pytest tests/test_provider_http.py tests/test_generation.py tests/test_runtime.py tests/test_settings.py -q`. Expected: pass. Record evidence and Task 2 completion.
+- [x] Write transport tests: root→`/v1`, existing `/v1`, `/gateway/v1`, trailing slash, recognized same/cross endpoint suffixes, rejected userinfo/query/fragment/control characters, denied 301/302/307/308, non-object/malformed/NaN JSON, oversize 8 MiB+1 body, HTTP/timeout errors. Use a fake opener; inspect actual Request headers/body/method and bounded read size. Capture formatted traceback/stdout/stderr to assert sentinel token/URL/body absent and sanitized exception has no cause/context.
+- [x] Write generation tests asserting exact model/messages/temperature=0/stream=false/max_tokens payload, valid content/citation preservation, blank content and malformed envelopes rejected, fixed sanitized `GeneratorError` for HTTP and parse failures.
+- [x] Run `uv run pytest tests/test_provider_http.py tests/test_generation.py -q`. Expected: new transport/adapter tests fail before implementation.
+- [x] Implement transport and generator, reusing shared URL validation in runtime. Never log/re-raise raw provider exceptions. Retain existing Ollama behavior.
+- [x] Run `uv run pytest tests/test_provider_http.py tests/test_generation.py tests/test_runtime.py tests/test_settings.py -q`. Expected: pass. Record evidence and Task 2 completion.
 
 ### Task 3: API embeddings
 
@@ -86,10 +86,10 @@ Every task below has its own failing-test gate and green regression gate. Tests 
 
 **Interfaces:** `OpenAICompatibleEmbedder(host: str, model: str, token: str, query_instruction: str, timeout: float = 30.0)` implements existing `Embedder`; new `EmbeddingError`.
 
-- [ ] Write tests for exact request/auth, out-of-order `[1,0]` restored to request order, unit vectors, instruction template and empty instruction, empty input without HTTP, and no dimension mutation on failed response. Parametrize missing/duplicate/boolean/out-of-range indices, wrong count, mixed/drifting/empty dimension, boolean/string elements, NaN/Infinity and zero vectors. Test very large/small finite values with stable normalization, and fixed errors/secret-free tracebacks. Existing caller canonicalization must remain unchanged; no extra canonicalization inside adapter.
-- [ ] Run `uv run pytest tests/test_embedding.py -q`. Expected: new API-adapter tests fail.
-- [ ] Implement using Task 2 transport; validate entire response before setting `dim`; normalize robustly without changing Ollama/eval contract.
-- [ ] Run `uv run pytest tests/test_embedding.py tests/test_retrievers.py tests/test_ingest.py -q`. Expected: pass. Record evidence and Task 3 completion.
+- [x] Write tests for exact request/auth, out-of-order `[1,0]` restored to request order, unit vectors, instruction template and empty instruction, empty input without HTTP, and no dimension mutation on failed response. Parametrize missing/duplicate/boolean/out-of-range indices, wrong count, mixed/drifting/empty dimension, boolean/string elements, NaN/Infinity and zero vectors. Test very large/small finite values with stable normalization, and fixed errors/secret-free tracebacks. Existing caller canonicalization must remain unchanged; no extra canonicalization inside adapter.
+- [x] Run `uv run pytest tests/test_embedding.py -q`. Expected: new API-adapter tests fail.
+- [x] Implement using Task 2 transport; validate entire response before setting `dim`; normalize robustly without changing Ollama/eval contract.
+- [x] Run `uv run pytest tests/test_embedding.py tests/test_retrievers.py tests/test_ingest.py -q`. Expected: pass. Record evidence and Task 3 completion.
 
 ### Task 4: API reranking and local loading boundary
 
@@ -97,10 +97,10 @@ Every task below has its own failing-test gate and green regression gate. Tests 
 
 **Interfaces:** `ApiReranker(host: str, model: str, token: str, timeout: float = 30.0)` implements Task 1 protocol; `RerankerError`. Existing local `Reranker(...)` remains compatible; CrossEncoder import moves to local construction.
 
-- [ ] Write tests for spec Cohere-style request (`top_n=len(hits)`) and `results/index/relevance_score` response. Assert descending score order, ties by original index, exact original Chunk identity, top_k clamp, and empty/nonpositive no-HTTP behavior. Reject partial/duplicate/missing/out-of-range/boolean indices and nonfinite/boolean scores. Assert sanitized timeout/HTTP/malformed errors and traceback redaction. Add isolated import test proving API reranker/runtime protocol imports do not import sentence-transformers/CrossEncoder; adapt existing local tests to mock the lazy import boundary.
-- [ ] Run `uv run pytest tests/test_api_rerank.py tests/test_rerank.py -q`. Expected: new API/import-boundary tests fail.
-- [ ] Implement strict full-list rerank contract via Task 2 transport and lazy local CrossEncoder construction. No arbitrary-provider compatibility claim.
-- [ ] Run the same command. Expected: pass. Record evidence and Task 4 completion.
+- [x] Write tests for spec Cohere-style request (`top_n=len(hits)`) and `results/index/relevance_score` response. Assert descending score order, ties by original index, exact original Chunk identity, top_k clamp, and empty/nonpositive no-HTTP behavior. Reject partial/duplicate/missing/out-of-range/boolean indices and nonfinite/boolean scores. Assert sanitized timeout/HTTP/malformed errors and traceback redaction. Add isolated import test proving API reranker/runtime protocol imports do not import sentence-transformers/CrossEncoder; adapt existing local tests to mock the lazy import boundary.
+- [x] Run `uv run pytest tests/test_api_rerank.py tests/test_rerank.py -q`. Expected: new API/import-boundary tests fail.
+- [x] Implement strict full-list rerank contract via Task 2 transport and lazy local CrossEncoder construction. No arbitrary-provider compatibility claim.
+- [x] Run the same command. Expected: pass. Record evidence and Task 4 completion.
 
 ### Task 5: Runtime composition and fail-closed index identity
 
@@ -113,12 +113,12 @@ Every task below has its own failing-test gate and green regression gate. Tests 
 - `build_runtime_app(settings: Settings) -> FastAPI`: compose existing four retrievers, `generation_k`, Pipeline and injected `create_app`; close store on failure/shutdown.
 - Add `VectorStore.check_ready() -> bool`, connect/statement timeout keyword options with runtime values 3s/2s and unchanged defaults for legacy callers.
 
-- [ ] Write constructor-spy tests: invalid cloud config constructs nothing; valid cloud constructs exactly three API adapters, never Ollama/CrossEncoder; local mixed choices work. Building components performs no HTTP. Identity is stable across URL suffix/trailing slash equivalents, changes for provider/endpoint/model/dim/instruction, and stores only `runtime-v1:<hash>`, never raw URL/token.
-- [ ] Write DB-free guard/order tests with a fake connection: stale chunks + missing metadata, populated legacy runtime index, empty legacy runtime index, mismatches and invalid dimensions all fail before metadata/DDL/chunk mutation. Legacy caller cannot open identity-bearing index. Fresh runtime creation is atomic with transaction-scoped advisory lock; failure rolls back. Retain valid legacy model/backend/dim behavior. Integration tests verify fresh/mismatch/legacy cases using `docsqa_test` and verify serialized initialization under two connections.
-- [ ] Write API composition tests with fake providers/store: probe is exactly `runtime dimension probe`, all four retrieval modes exist, V2a/default generation limits preserved, failed init closes DB, shutdown closes DB, provider request failures return generic 502. Assert startup diagnostics/tracebacks never include sentinel DB URL/token/provider body.
-- [ ] Run `uv run pytest tests/test_runtime.py tests/test_index_identity.py tests/test_store.py tests/test_api.py -q`. Expected: new factory/identity/lifecycle assertions fail.
-- [ ] Implement factory, identity/schema guard and API composition; inspection/lock precedes writes. Do not reset or backfill populated legacy indexes. Keep dependency-injected create_app compatible; do not automatically start serving here.
-- [ ] Run `uv run pytest tests/test_runtime.py tests/test_index_identity.py tests/test_store.py tests/test_api.py tests/test_pipeline.py tests/test_retrievers.py tests/test_import_hygiene.py -q`. Expected: pass, including test DB integrations. Record evidence and strict legacy rebuild policy in ledger; mark Task 5 complete.
+- [x] Write constructor-spy tests: invalid cloud config constructs nothing; valid cloud constructs exactly three API adapters, never Ollama/CrossEncoder; local mixed choices work. Building components performs no HTTP. Identity is stable across URL suffix/trailing slash equivalents, changes for provider/endpoint/model/dim/instruction, and stores only `runtime-v1:<hash>`, never raw URL/token.
+- [x] Write DB-free guard/order tests with a fake connection: stale chunks + missing metadata, populated legacy runtime index, empty legacy runtime index, mismatches and invalid dimensions all fail before metadata/DDL/chunk mutation. Legacy caller cannot open identity-bearing index. Fresh runtime creation is atomic with transaction-scoped advisory lock; failure rolls back. Retain valid legacy model/backend/dim behavior. Integration tests verify fresh/mismatch/legacy cases using `docsqa_test` and verify serialized initialization under two connections.
+- [x] Write API composition tests with fake providers/store: probe is exactly `runtime dimension probe`, all four retrieval modes exist, V2a/default generation limits preserved, failed init closes DB, shutdown closes DB, provider request failures return generic 502. Assert startup diagnostics/tracebacks never include sentinel DB URL/token/provider body.
+- [x] Run `uv run pytest tests/test_runtime.py tests/test_index_identity.py tests/test_store.py tests/test_api.py -q`. Expected: new factory/identity/lifecycle assertions fail.
+- [x] Implement factory, identity/schema guard and API composition; inspection/lock precedes writes. Do not reset or backfill populated legacy indexes. Keep dependency-injected create_app compatible; do not automatically start serving here.
+- [x] Run `uv run pytest tests/test_runtime.py tests/test_index_identity.py tests/test_store.py tests/test_api.py tests/test_pipeline.py tests/test_retrievers.py tests/test_import_hygiene.py -q`. Expected: pass, including test DB integrations. Record evidence and strict legacy rebuild policy in ledger; mark Task 5 complete.
 
 ### Task 6: ASGI serving, readiness and deployment artifacts
 
@@ -130,11 +130,11 @@ Every task below has its own failing-test gate and green regression gate. Tests 
 - `create_runtime_app() -> FastAPI`: settings/storage validation before Task 5 composition; `main() -> None` serves without duplicate initialization. Preserve `api.serve()` wrapper; console script `docsqa-api`.
 - GET `/health`: 200 process-only; GET `/ready`: config/index/DB state + provider `configured`, 200/503 without provider HTTP.
 
-- [ ] Write tests for local bind defaults, cloud assigned PORT and explicit deployment gate, bad/missing/boolean-like/out-of-range PORT, local non-loopback rejection. Validate cloud missing/relative/symlink/unwritable paths fail before any provider/DB calls; temporary sentinel cleanup on success/failure. Test readiness DB failure→503, health→200, no provider calls, no false live-provider claim, bounded DB checks and lifecycle cleanup.
-- [ ] Write static packaging tests: direct Uvicorn dependency, console script and ASGI factory import, Docker startup command via `scripts/container_start.sh`, no secret build args, `.dockerignore` excludes env/PDF/data/eval/Git, Render single-instance disk `/var/data`, uploads `/var/data/uploads`, correct assigned port and deployment approval false. Startup script creates upload subdirectory only under configured mount; cloud app must reject absent mount/config rather than silently using ephemeral local uploads. Add Python subprocess offline import smoke for API/UI.
-- [ ] Run `uv run pytest tests/test_deployment.py tests/test_api.py -q`. Expected: new serving/readiness/artifact tests fail.
-- [ ] Implement entrypoint/readiness/storage and artifacts; add compatible stable direct Uvicorn dependency through uv. Use reproducible lock-based Docker install, no build-time model downloads/secrets. Render template is not auto-deployed; document parser resource/network limits. Validate mount presence in container script (not simply directory existence) before creating cloud upload subdirectory.
-- [ ] Run `uv run pytest tests/test_deployment.py tests/test_api.py tests/test_runtime.py -q`; `uv run python -c "import docsqa.api, docsqa.ui, docsqa.serve"`. Expected: pass, no provider calls. If Docker available, build with bounded timeout and no provider credentials; report build separately, never substitute static tests for build evidence. Record Task 6 completion and any platform validation not run.
+- [x] Write tests for local bind defaults, cloud assigned PORT and explicit deployment gate, bad/missing/boolean-like/out-of-range PORT, local non-loopback rejection. Validate cloud missing/relative/symlink/unwritable paths fail before any provider/DB calls; temporary sentinel cleanup on success/failure. Test readiness DB failure→503, health→200, no provider calls, no false live-provider claim, bounded DB checks and lifecycle cleanup.
+- [x] Write static packaging tests: direct Uvicorn dependency, console script and ASGI factory import, Docker startup command via `scripts/container_start.sh`, no secret build args, `.dockerignore` excludes env/PDF/data/eval/Git, Render single-instance disk `/var/data`, uploads `/var/data/uploads`, correct assigned port and deployment approval false. Startup script creates upload subdirectory only under configured mount; cloud app must reject absent mount/config rather than silently using ephemeral local uploads. Add Python subprocess offline import smoke for API/UI.
+- [x] Run `uv run pytest tests/test_deployment.py tests/test_api.py -q`. Expected: new serving/readiness/artifact tests fail.
+- [x] Implement entrypoint/readiness/storage and artifacts; add compatible stable direct Uvicorn dependency through uv. Use reproducible lock-based Docker install, no build-time model downloads/secrets. Render template is not auto-deployed; document parser resource/network limits. Validate mount presence in container script (not simply directory existence) before creating cloud upload subdirectory.
+- [x] Run `uv run pytest tests/test_deployment.py tests/test_api.py tests/test_runtime.py -q`; `uv run python -c "import docsqa.api, docsqa.ui, docsqa.serve"`. Expected: pass, no provider calls. If Docker available, build with bounded timeout and no provider credentials; report build separately, never substitute static tests for build evidence. Record Task 6 completion and any platform validation not run.
 
 ### Task 7: Documentation, opt-in smoke and final review
 
@@ -142,11 +142,11 @@ Every task below has its own failing-test gate and green regression gate. Tests 
 
 **Interfaces:** `scripts/runtime_api_smoke.py:main(argv: list[str] | None = None) -> int`; uses process env only (`Settings(_env_file=None)`), requires `--allow-network`, and reports synthetic-test pass/fail counts without secrets.
 
-- [ ] Write tests: no flag→generic skipped, exit 0, zero construction/HTTP; flag + incomplete cloud→nonzero, zero HTTP; valid mocked config→generation/embedding/rerank synthetic checks; failed synthetic semantics count as failure, not merely completed HTTP; sanitized output with no raw error, URL, model response, token or corpus text. Run under mocks only. Security/docs tests pin runtime/judge separation, V2a three-provider cloud, local UI boundary, legacy rebuild requirement and unimplemented public-security gates.
-- [ ] Run `uv run pytest tests/test_runtime_smoke.py tests/test_security_sweep.py -q`. Expected: new smoke/docs tests fail.
-- [ ] Implement smoke interlock and docs: exact env examples/CLI, full-list rerank contract, network/cost/retention implications, separate approved provider smoke, fresh DB/reindex guidance without running it, backup/mount/resource/parser requirements, API-only serving and UI connection. Preserve benchmark numbers/provenance; do not resolve predeclared-vs-held-out wording without dated evidence. Update status to distinguish implemented infrastructure from deployment authorization.
-- [ ] Run `uv run pytest -q`, `uv run ruff check src tests eval scripts`, `git --no-pager diff --check`, `uv run pytest tests/test_security_sweep.py tests/test_import_hygiene.py -q`. Expected: pass. Run smoke without flag only; expected skip with zero network calls. Secret-scan new/untracked implementation files too; report paths/counts only, never matching secret text.
-- [ ] Perform whole-change self-review against revised spec, audit and Review Focus; no fresh reviewer tool is available, so explicitly record weaker self-review. Fix important findings with RED → GREEN regression evidence; ledger minor deferrals. Update completed checkboxes only for verified tasks. Do not deploy, invoke network-enabled smoke, commit or delete another plan's workspace.
+- [x] Write tests: no flag→generic skipped, exit 0, zero construction/HTTP; flag + incomplete cloud→nonzero, zero HTTP; valid mocked config→generation/embedding/rerank synthetic checks; failed synthetic semantics count as failure, not merely completed HTTP; sanitized output with no raw error, URL, model response, token or corpus text. Run under mocks only. Security/docs tests pin runtime/judge separation, V2a three-provider cloud, local UI boundary, legacy rebuild requirement and unimplemented public-security gates.
+- [x] Run `uv run pytest tests/test_runtime_smoke.py tests/test_security_sweep.py -q`. Expected: new smoke/docs tests fail.
+- [x] Implement smoke interlock and docs: exact env examples/CLI, full-list rerank contract, network/cost/retention implications, separate approved provider smoke, fresh DB/reindex guidance without running it, backup/mount/resource/parser requirements, API-only serving and UI connection. Preserve benchmark numbers/provenance; do not resolve predeclared-vs-held-out wording without dated evidence. Update status to distinguish implemented infrastructure from deployment authorization.
+- [x] Run `uv run pytest -q`, `uv run ruff check src tests eval scripts`, `git --no-pager diff --check`, `uv run pytest tests/test_security_sweep.py tests/test_import_hygiene.py -q`. Expected: pass. Run smoke without flag only; expected skip with zero network calls. Secret-scan new/untracked implementation files too; report paths/counts only, never matching secret text.
+- [x] Perform whole-change self-review against revised spec, audit and Review Focus; no fresh reviewer tool is available, so explicitly record weaker self-review. Fix important findings with RED → GREEN regression evidence; ledger minor deferrals. Update completed checkboxes only for verified tasks. Do not deploy, invoke network-enabled smoke, commit or delete another plan's workspace.
 
 ## Self-review of revised plan
 
