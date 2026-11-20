@@ -68,9 +68,8 @@ def test_reranker_reorders_by_cross_encoder_score() -> None:
 
 
 def test_reranker_device_batch_defaults_and_overrides(monkeypatch) -> None:
+    import sentence_transformers
     import torch
-
-    import docsqa.rerank as rerank_module
 
     monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
     captured: dict[str, object] = {}
@@ -80,7 +79,7 @@ def test_reranker_device_batch_defaults_and_overrides(monkeypatch) -> None:
             captured["model"] = model
             captured.update(kwargs)
 
-    monkeypatch.setattr(rerank_module, "CrossEncoder", RecordingCrossEncoder)
+    monkeypatch.setattr(sentence_transformers, "CrossEncoder", RecordingCrossEncoder)
     cpu_reranker = Reranker(device="cpu")
     cuda_reranker = Reranker(device="cuda")
     overridden = Reranker(device="cuda", batch_size=4)

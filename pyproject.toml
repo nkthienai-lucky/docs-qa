@@ -5,6 +5,7 @@ description = "Handwritten Vietnamese document QA with citations and evaluation"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "fastapi>=0.115,<1",
+  "uvicorn>=0.34,<1",
   "gradio>=5,<6",
   "pydantic-settings>=2.7,<3",
   "psycopg[binary]>=3.2,<4",
@@ -19,6 +20,7 @@ dependencies = [
 
 [project.scripts]
 docsqa-ui = "docsqa.ui:serve_ui"
+docsqa-api = "docsqa.serve:main"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from types import SimpleNamespace
 
 import psycopg
 import pytest
@@ -127,3 +128,81 @@ def test_embedder_mismatch_raises(store: VectorStore) -> None:
     )
     with pytest.raises(EmbedderMismatchError):
         other_dim.ensure_schema()
+
+
+def test_runtime_index_fresh_reopen_mismatch_and_legacy_boundary():
+    _drop_tables()
+    meta = EmbedderMeta("api-test", "openai_compatible", 3, "runtime-v1:test")
+    first = VectorStore(TEST_DATABASE_URL, meta)
+    second = VectorStore(TEST_DATABASE_URL, meta)
+    legacy = VectorStore(
+        TEST_DATABASE_URL, EmbedderMeta("api-test", "openai_compatible", 3)
+    )
+    wrong = VectorStore(
+        TEST_DATABASE_URL,
+        EmbedderMeta("api-test", "openai_compatible", 3, "runtime-v1:other"),
+    )
+    try:
+        first.ensure_schema()
+        second.ensure_schema()
+        assert second.check_ready()
+        for store in [legacy, wrong]:
+            with pytest.raises(EmbedderMismatchError):
+                store.ensure_schema()
+    finally:
+        for store in [first, second, legacy, wrong]:
+            store.close()
+        _drop_tables()
+
+
+def test_runtime_refuses_empty_legacy_index(store):
+    other = VectorStore(
+        TEST_DATABASE_URL, EmbedderMeta("test-embed", "test", 3, "runtime-v1:test")
+    )
+    try:
+        with pytest.raises(EmbedderMismatchError):
+            other.ensure_schema()
+    finally:
+        other.close()
+
+
+def test_concurrent_runtime_initialization_serialized():
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    _drop_tables()
+    barrier = Barrier(2)
+
+    def initialize():
+        store = VectorStore(
+            TEST_DATABASE_URL, EmbedderMeta("m", "api", 3, "runtime-v1:test")
+        )
+        try:
+            barrier.wait(timeout=10)
+            store.ensure_schema()
+            return store.check_ready()
+        finally:
+            store.close()
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            assert list(executor.map(lambda _: initialize(), range(2))) == [True, True]
+    finally:
+        _drop_tables()
+
+
+def test_check_ready_uses_dedicated_connection(monkeypatch):
+    calls = []
+
+    def fake_connect(url, **kwargs):
+        calls.append(kwargs)
+        return SimpleNamespace(
+            execute=lambda sql: SimpleNamespace(fetchone=lambda: (1,)),
+            close=lambda: None,
+        )
+
+    monkeypatch.setattr("docsqa.store.psycopg.connect", fake_connect)
+    store = VectorStore(TEST_DATABASE_URL, EmbedderMeta("m", "api", 3))
+    assert store.check_ready() is True
+    assert len(calls) == 1
+    assert store._conn is None  # does not touch the shared request connection

@@ -65,7 +65,10 @@ class FakeRetriever:
 class FakePipeline:
     def __init__(self) -> None:
         self.embedder = FakeEmbedder()
-        self.retrievers = {"v1": FakeRetriever(self.embedder), "v2a": FakeRetriever(self.embedder)}
+        self.retrievers = {
+            "v1": FakeRetriever(self.embedder),
+            "v2a": FakeRetriever(self.embedder),
+        }
         self.calls: list[tuple[str, str, list[str] | None]] = []
 
     def ask(self, question, config="v2a", doc_ids=None):
@@ -180,7 +183,9 @@ def test_non_pdf_and_oversize_rejected_with_4xx(
 
     not_pdf = env.client.post(
         "/documents",
-        files={"file": ("a.pdf", b"plain text with no magic header", "application/pdf")},
+        files={
+            "file": ("a.pdf", b"plain text with no magic header", "application/pdf")
+        },
     )
     assert not_pdf.status_code == 400
     assert "PDF" in not_pdf.json()["detail"]
@@ -322,3 +327,128 @@ def test_ingest_error_maps_to_422_and_discards_file(
 def test_serve_binds_loopback_only() -> None:
     # Unit-level: the host constant serve() passes to uvicorn is loopback.
     assert HOST == "127.0.0.1"
+
+
+@pytest.mark.parametrize("error_kind", ["generation", "embedding", "rerank"])
+def test_provider_errors_return_generic_502(env, error_kind, monkeypatch):
+    from docsqa.api_rerank import RerankerError
+    from docsqa.embedding import EmbeddingError
+    from docsqa.generation import GeneratorError
+
+    def fail(*args, **kwargs):
+        raise {
+            "generation": GeneratorError,
+            "embedding": EmbeddingError,
+            "rerank": RerankerError,
+        }[error_kind]("sentinel-private")
+
+    monkeypatch.setattr(env.pipeline, "ask", fail)
+    response = env.client.post("/ask", json={"question": "q"})
+    assert response.status_code == 502
+    assert response.json() == {"detail": "provider request failed"}
+
+
+def runtime_app_fakes(monkeypatch, tmp_path, fail=False):
+    from docsqa import bm25
+    from docsqa.runtime import RuntimeComponents
+    from docsqa.settings import Settings
+
+    class Store(FakeStore):
+        def __init__(self, *args, **kwargs):
+            super().__init__()
+            self.args, self.kwargs, self.closed = args, kwargs, False
+
+        def ensure_schema(self):
+            if fail:
+                raise RuntimeError("sentinel-db-url")
+
+        def close(self):
+            self.closed = True
+
+        def check_ready(self):
+            return True
+
+    store = Store()
+    monkeypatch.setattr(api_module, "VectorStore", lambda *args, **kwargs: store)
+    embedder = FakeEmbedder()
+    probes = []
+    original = embedder.embed_documents
+
+    def embed(texts):
+        probes.extend(texts)
+        return original(texts)
+
+    embedder.embed_documents = embed
+    components = RuntimeComponents(
+        SimpleNamespace(generate=lambda messages: "answer"),
+        embedder,
+        SimpleNamespace(rerank=lambda query, hits, top_k: hits[:top_k]),
+    )
+    monkeypatch.setattr(
+        "docsqa.runtime.build_runtime_components", lambda settings: components
+    )
+    monkeypatch.setattr(
+        "docsqa.runtime.runtime_index_identity", lambda *args: "runtime-v1:hash"
+    )
+    monkeypatch.setattr(bm25.BM25Index, "from_store", lambda store: SimpleNamespace())
+    return Settings(_env_file=None, runtime_upload_dir=str(tmp_path)), store, probes
+
+
+def test_runtime_composition_and_shutdown(monkeypatch, tmp_path):
+    settings, store, probes = runtime_app_fakes(monkeypatch, tmp_path)
+    app = api_module.build_runtime_app(settings)
+    assert probes == ["runtime dimension probe"]
+    pipeline = app.state.pipeline
+    assert set(pipeline.retrievers) == {"v1", "v2a", "v2b", "v2b_norerank"}
+    assert pipeline.final_k == 5 and pipeline.generation_k == 1
+    with TestClient(app) as client:
+        assert client.get("/health").status_code == 200
+        assert not store.closed
+    assert store.closed
+
+
+def test_runtime_startup_failure_closes_and_hides_context(monkeypatch, tmp_path):
+    import traceback
+
+    from docsqa.runtime import RuntimeConfigurationError
+
+    settings, store, _ = runtime_app_fakes(monkeypatch, tmp_path, fail=True)
+    with pytest.raises(RuntimeConfigurationError) as caught:
+        api_module.build_runtime_app(settings)
+    assert store.closed
+    assert caught.value.__context__ is None
+    assert "sentinel" not in "".join(traceback.format_exception(caught.value))
+
+
+def test_readiness_is_not_provider_liveness(monkeypatch, tmp_path):
+    settings, store, _ = runtime_app_fakes(monkeypatch, tmp_path)
+    app = api_module.build_runtime_app(settings)
+    monkeypatch.setattr(
+        "docsqa.provider_http.post_json",
+        lambda *args: pytest.fail("readiness must not call providers"),
+    )
+    with TestClient(app) as client:
+        response = client.get("/ready")
+        assert response.status_code == 200
+        assert response.json()["providers"] == "configured"
+        monkeypatch.setattr(store, "check_ready", lambda: False)
+        response = client.get("/ready")
+        assert response.status_code == 503
+        assert client.get("/health").status_code == 200
+
+
+def test_runtime_captures_store_options_and_generation_k(monkeypatch, tmp_path):
+    captured = {}
+    settings, store, _probes = runtime_app_fakes(monkeypatch, tmp_path)
+
+    def spy(*args, **kwargs):
+        captured.update(args=args, kwargs=kwargs)
+        return store
+
+    monkeypatch.setattr(api_module, "VectorStore", spy)
+    settings.generation_k = 3
+    app = api_module.build_runtime_app(settings)
+    assert captured["kwargs"]["connect_timeout"] == 3
+    assert captured["kwargs"]["statement_timeout_ms"] == 2000
+    assert app.state.pipeline.generation_k == 3
+    assert app.state.runtime_index_validated is True

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -45,11 +46,58 @@ class DocumentOut(BaseModel):
 
 
 def create_app(pipeline: Pipeline, store: VectorStore, data_dir: Path) -> FastAPI:
-    app = FastAPI(title="docs-qa")
+    @asynccontextmanager
+    async def lifespan(app):
+        try:
+            yield
+        finally:
+            if getattr(app.state, "owns_store", False):
+                store.close()
+
+    app = FastAPI(title="docs-qa", lifespan=lifespan)
+    app.state.pipeline = pipeline
+    app.state.store = store
+    app.state.owns_store = False
+
+    from fastapi.responses import JSONResponse
+
+    from .api_rerank import RerankerError
+    from .embedding import EmbeddingError
+    from .generation import GeneratorError
+
+    async def provider_error(request, error):
+        return JSONResponse(
+            status_code=502, content={"detail": "provider request failed"}
+        )
+
+    for error_type in (GeneratorError, EmbeddingError, RerankerError):
+        app.add_exception_handler(error_type, provider_error)
 
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/ready")
+    def ready():
+        index_validated = bool(getattr(app.state, "runtime_index_validated", False))
+        initialized = (
+            bool(getattr(app.state, "runtime_initialized", False)) and index_validated
+        )
+        database_ready = False
+        if initialized:
+            try:
+                database_ready = store.check_ready()
+            except Exception:  # noqa: BLE001 — readiness must not leak DB diagnostics
+                database_ready = False
+        state = {
+            "config": "validated" if initialized else "unverified",
+            "index": "validated" if index_validated else "unverified",
+            "database": "ready" if database_ready else "unavailable",
+            "providers": "configured" if initialized else "unverified",
+        }
+        return JSONResponse(
+            status_code=200 if initialized and database_ready else 503, content=state
+        )
 
     @app.get("/documents")
     def documents() -> list[dict[str, Any]]:
@@ -126,56 +174,68 @@ def create_app(pipeline: Pipeline, store: VectorStore, data_dir: Path) -> FastAP
     return app
 
 
-def serve() -> None:
-    """Build the deployment stack from settings and serve on loopback only."""
-    import uvicorn
-
+def build_runtime_app(settings) -> FastAPI:
+    from . import runtime
     from .bm25 import BM25Index
-    from .embedding import OllamaEmbedder
-    from .generation import OllamaGenerator
-    from .rerank import Reranker
+    from .pipeline import Pipeline
     from .retrieval import HybridRetriever, RerankRetriever, VectorRetriever
-    from .settings import get_settings
 
-    settings = get_settings()
-    embedder = OllamaEmbedder(
-        host=settings.ollama_host,
-        model=settings.embed_model,
-        query_instruction="Given a web search query, retrieve relevant passages",
-    )
-    # dim is 0 until the first embed call — probe before building EmbedderMeta.
-    embedder.embed_documents(["probe text"])
-    store = VectorStore(
-        settings.database_url,
-        EmbedderMeta(model=embedder.model, backend=embedder.backend, dim=embedder.dim),
-    )
-    store.ensure_schema()
-    vector = VectorRetriever(store, embedder, top_k=50)
-    bm25 = BM25Index.from_store(store)
-    reranker = Reranker(
-        settings.reranker_model,
-        device=settings.reranker_device,
-        batch_size=settings.reranker_batch_size,
-    )
-    retrievers = {
-        "v1": VectorRetriever(store, embedder, top_k=5),
-        "v2a": RerankRetriever(vector, reranker, candidates=50, top_k=5),
-        "v2b": HybridRetriever(
-            vector, bm25, store, reranker=reranker, candidates=50, top_k=5
-        ),
-        "v2b_norerank": HybridRetriever(
-            vector, bm25, store, reranker=None, candidates=50, top_k=5
-        ),
-    }
-    pipeline = Pipeline(
-        retrievers,
-        OllamaGenerator(
-            host=settings.ollama_host,
-            model=settings.generator_model,
-            num_ctx=settings.num_ctx,
-            num_predict=settings.generator_num_predict,
-        ),
-        final_k=5,
-        generation_k=settings.generation_k,
-    )
-    uvicorn.run(create_app(pipeline, store, Path("data/uploads")), host=HOST, port=8000)
+    store = None
+    app = None
+    try:
+        components = runtime.build_runtime_components(settings)
+        embedder = components.embedder
+        embedder.embed_documents(["runtime dimension probe"])
+        identity = runtime.runtime_index_identity(settings, embedder)
+        store = VectorStore(
+            settings.database_url,
+            EmbedderMeta(embedder.model, embedder.backend, embedder.dim, identity),
+            connect_timeout=3,
+            statement_timeout_ms=2000,
+        )
+        store.ensure_schema()
+        vector = VectorRetriever(store, embedder, top_k=50)
+        bm25 = BM25Index.from_store(store)
+        retrievers = {
+            "v1": VectorRetriever(store, embedder, top_k=5),
+            "v2a": RerankRetriever(vector, components.reranker, candidates=50, top_k=5),
+            "v2b": HybridRetriever(
+                vector,
+                bm25,
+                store,
+                reranker=components.reranker,
+                candidates=50,
+                top_k=5,
+            ),
+            "v2b_norerank": HybridRetriever(
+                vector, bm25, store, reranker=None, candidates=50, top_k=5
+            ),
+        }
+        pipeline = Pipeline(
+            retrievers,
+            components.generator,
+            final_k=5,
+            generation_k=settings.generation_k,
+        )
+        app = create_app(pipeline, store, Path(settings.runtime_upload_dir))
+        app.state.owns_store = True
+        app.state.runtime_initialized = True
+        # Only set after probe + identity validation + ensure_schema succeeded.
+        app.state.runtime_index_validated = True
+    except Exception:  # noqa: BLE001 — startup failures may contain credentials
+        if store is not None:
+            try:
+                store.close()
+            except Exception:  # noqa: BLE001, S110 — cleanup errors must not leak credentials
+                pass
+    if app is None:
+        raise runtime.RuntimeConfigurationError(
+            "runtime initialization failed; verify configuration and fresh index"
+        )
+    return app
+
+
+def serve() -> None:
+    from .serve import main
+
+    main()

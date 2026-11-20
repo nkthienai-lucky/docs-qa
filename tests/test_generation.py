@@ -198,3 +198,61 @@ def test_generate_sends_temperature_zero_think_false_and_num_ctx(
     assert body["options"]["temperature"] == 0
     assert body["options"]["num_ctx"] == 4096
     assert body["options"]["num_predict"] == 256
+
+
+def test_api_generation_payload_and_citations(monkeypatch):
+    from docsqa import generation
+
+    captured = {}
+
+    def post(url, token, payload, timeout):
+        captured.update(payload)
+        return {"choices": [{"message": {"content": "Answer [1]"}}]}
+
+    monkeypatch.setattr("docsqa.provider_http.post_json", post)
+    adapter = generation.OpenAICompatibleGenerator("https://host", "chat", "token")
+    messages = [{"role": "user", "content": "question"}]
+    assert adapter.generate(messages) == "Answer [1]"
+    assert captured == {
+        "model": "chat",
+        "messages": messages,
+        "temperature": 0,
+        "stream": False,
+        "max_tokens": 256,
+    }
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {},
+        {"choices": []},
+        {"choices": [{"message": {"content": ""}}]},
+        {"choices": [{"message": {"content": 42}}]},
+    ],
+)
+def test_api_generation_malformed_response(monkeypatch, body):
+    from docsqa import generation
+
+    monkeypatch.setattr("docsqa.provider_http.post_json", lambda *args: body)
+    with pytest.raises(generation.GeneratorError) as caught:
+        generation.OpenAICompatibleGenerator("https://host", "chat", "token").generate(
+            []
+        )
+    assert str(caught.value) == "generation provider request failed"
+    assert caught.value.__context__ is None
+
+
+def test_api_generation_transport_error_has_no_chain(monkeypatch):
+    import traceback
+
+    from docsqa.generation import OpenAICompatibleGenerator
+
+    def fail(*args):
+        raise TimeoutError("sentinel-body sentinel-token https://private")
+
+    monkeypatch.setattr("docsqa.provider_http.post_json", fail)
+    with pytest.raises(GeneratorError) as caught:
+        OpenAICompatibleGenerator("https://host", "chat", "token").generate([])
+    assert caught.value.__context__ is caught.value.__cause__ is None
+    assert "sentinel" not in "".join(traceback.format_exception(caught.value))

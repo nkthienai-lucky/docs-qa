@@ -75,6 +75,52 @@ class GeneratorError(Exception):
     """Ollama chat request failed. The message never contains request headers."""
 
 
+class OpenAICompatibleGenerator:
+    """Deterministic chat adapter using the shared bounded transport."""
+
+    def __init__(
+        self,
+        host: str,
+        model: str,
+        token: str,
+        timeout: float = 30.0,
+        max_tokens: int = 256,
+    ) -> None:
+        from . import provider_http
+
+        self.endpoint = provider_http.provider_endpoint(host, "chat/completions")
+        self.model = model
+        self.token = token
+        self.timeout = timeout
+        self.max_tokens = max_tokens
+
+    def generate(self, messages: list[dict[str, str]]) -> str:
+        from . import provider_http
+
+        content = None
+        try:
+            body = provider_http.post_json(
+                self.endpoint,
+                self.token,
+                {
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": 0,
+                    "stream": False,
+                    "max_tokens": self.max_tokens,
+                },
+                self.timeout,
+            )
+            value = body["choices"][0]["message"]["content"]
+            if isinstance(value, str) and value.strip():
+                content = value
+        except Exception:  # noqa: BLE001, S110 — upstream errors may contain secrets
+            pass
+        if content is None:
+            raise GeneratorError("generation provider request failed")
+        return content
+
+
 class OllamaGenerator:
     """Chat client for Ollama's `/api/chat` endpoint, pinned to deterministic output."""
 

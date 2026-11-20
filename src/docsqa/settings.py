@@ -1,10 +1,36 @@
+from enum import Enum
 from functools import lru_cache
+from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class RuntimeProfile(str, Enum):
+    LOCAL = "local"
+    CLOUD = "cloud"
+
+
 class Settings(BaseSettings):
+    runtime_profile: RuntimeProfile = RuntimeProfile.LOCAL
+    runtime_generation_provider: Literal["ollama", "openai_compatible"] = "ollama"
+    runtime_embedding_provider: Literal["ollama", "openai_compatible"] = "ollama"
+    runtime_rerank_provider: Literal["local", "api"] = "local"
+    runtime_chat_base_url: SecretStr | None = None
+    runtime_chat_token: SecretStr | None = None
+    runtime_chat_model: str | None = None
+    runtime_embedding_base_url: SecretStr | None = None
+    runtime_embedding_token: SecretStr | None = None
+    runtime_embedding_model: str | None = None
+    runtime_rerank_base_url: SecretStr | None = None
+    runtime_rerank_token: SecretStr | None = None
+    runtime_rerank_model: str | None = None
+    runtime_embedding_query_instruction: str = (
+        "Given a web search query, retrieve relevant passages"
+    )
+    runtime_api_timeout_s: float = Field(default=30, gt=0, le=120, allow_inf_nan=False)
+    runtime_upload_dir: str = "data/uploads"
+    runtime_deployment_approved: bool = False
     database_url: str = "postgresql://roadmap:roadmap@localhost:5432/docsqa"
     ollama_host: str = "http://127.0.0.1:11434"
     generator_model: str = "qwen3.5:9b"
@@ -37,6 +63,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
         repr=False,
+        hide_input_in_errors=True,
     )
 
 

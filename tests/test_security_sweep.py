@@ -117,7 +117,7 @@ def test_serve_functions_bind_only_to_loopback(monkeypatch):
     from docsqa import api
 
     source = (ROOT / "src/docsqa/api.py").read_text(encoding="utf-8")
-    assert "host=HOST" in source
+    assert "from .serve import main" in source
     assert api.HOST == "127.0.0.1"
     assert 'server_name="127.0.0.1"' in (ROOT / "src/docsqa/ui.py").read_text(
         encoding="utf-8"
@@ -126,17 +126,19 @@ def test_serve_functions_bind_only_to_loopback(monkeypatch):
     assert "bound to `127.0.0.1`" in (ROOT / "README.md").read_text(encoding="utf-8")
     import inspect
 
-    assert "host=HOST" in inspect.getsource(api.serve)
+    assert "main()" in inspect.getsource(api.serve)
+    from docsqa.serve import resolve_bind
+    from docsqa.settings import Settings
+
+    assert resolve_bind(Settings(_env_file=None), {}) == ("127.0.0.1", 8000)
     assert "127.0.0.1" in inspect.getsource(ui.launch_ui)
-
-
 
 
 def test_stage3_docs_record_v2a_default_and_local_waiver():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    roadmap = (ROOT.parent / "AI-Engineer-Roadmap/docs/cores/03-RAG/07-project-docs-qa.md").read_text(
-        encoding="utf-8"
-    )
+    roadmap = (
+        ROOT.parent / "AI-Engineer-Roadmap/docs/cores/03-RAG/07-project-docs-qa.md"
+    ).read_text(encoding="utf-8")
 
     assert "Runtime/API/UI default retrieval is **V2a" in readme
     assert "eval/protocol-v2/report-final-rerun-gpu-api/" in readme
@@ -145,3 +147,20 @@ def test_stage3_docs_record_v2a_default_and_local_waiver():
     assert "eval/protocol-v2/report-final-rerun-gpu-api/" in roadmap
     assert "confidence-interval lower bounds" in roadmap
     assert "public deployment is not complete" in roadmap
+
+
+def test_runtime_docs_security_boundary():
+    readme = (ROOT / "README.md").read_text()
+    for required in [
+        "RUNTIME_CHAT_TOKEN",
+        "API_JUDGE_*",
+        "full-list",
+        "legacy",
+        "--allow-network",
+        "auth",
+        "rate limit",
+        "retention",
+        "UI remains local",
+        "not deployment authorization",
+    ]:
+        assert required in readme

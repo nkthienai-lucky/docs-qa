@@ -61,3 +61,14 @@ cd /mnt/d/Thien/Code/docs-qa
   "/mnt/d/Thien/Code/doc-ocr/workspace/SGK Toán 9, tập một-mau.pdf" \
   "/mnt/d/Thien/Code/doc-ocr/workspace/English-Vocabulary-in-Use-Pre-Intermediate.pdf"
 ```
+
+## Runtime API boundary (2026-11-19)
+
+Runtime cloud inference requires separate approval for corpus egress to generation,
+embedding and full-list reranking APIs; eval judge approval is not transferable.
+No real provider calls, corpus upload, destructive reset or held-out rerun were
+performed as part of infrastructure implementation. Legacy indexes require a
+separate fresh index/rebuild under the hashed runtime identity policy (README).
+Preserve the old DB and pair DB/upload backups before approved reingestion.
+The UI remains local; parser assets/network and CPU/RAM limits remain deployment
+gates, not consequences of moving inference to APIs.

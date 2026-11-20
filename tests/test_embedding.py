@@ -24,7 +24,9 @@ class _FakeResponse:
         return False
 
 
-def _install_fake_urlopen(monkeypatch: pytest.MonkeyPatch, raw_vector: list[float]) -> list[dict]:
+def _install_fake_urlopen(
+    monkeypatch: pytest.MonkeyPatch, raw_vector: list[float]
+) -> list[dict]:
     calls: list[dict] = []
 
     def fake_urlopen(request, timeout=None):
@@ -36,7 +38,9 @@ def _install_fake_urlopen(monkeypatch: pytest.MonkeyPatch, raw_vector: list[floa
     return calls
 
 
-def test_query_gets_instruction_documents_do_not(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_query_gets_instruction_documents_do_not(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     calls = _install_fake_urlopen(monkeypatch, [3.0, 4.0, 0.0, 0.0])
     embedder = OllamaEmbedder(
         host="http://127.0.0.1:11434",
@@ -52,8 +56,10 @@ def test_query_gets_instruction_documents_do_not(monkeypatch: pytest.MonkeyPatch
     assert query_call["body"] == {
         "model": "qwen3-embedding:0.6b",
         "input": [
-            ("Instruct: Given a web search query, retrieve relevant passages\n"
-            "Query: cách cài đặt OCR")
+            (
+                "Instruct: Given a web search query, retrieve relevant passages\n"
+                "Query: cách cài đặt OCR"
+            )
         ],
     }
     assert documents_call["body"]["input"] == ["văn bản thứ nhất", "văn bản thứ hai"]
@@ -78,3 +84,118 @@ def test_vectors_are_unit_norm(monkeypatch: pytest.MonkeyPatch) -> None:
     assert embedder.dim == 4
     assert embedder.backend == "ollama"
     assert embedder.model == "qwen3-embedding:0.6b"
+
+
+def api_embedder(monkeypatch, body, instruction="retrieve"):
+    captured = []
+
+    def post(*args):
+        captured.append(args)
+        return body
+
+    monkeypatch.setattr("docsqa.provider_http.post_json", post)
+    return embedding_module.OpenAICompatibleEmbedder(
+        "https://host", "embed", "token", instruction
+    ), captured
+
+
+def test_api_embeddings_restore_order_and_preserve_inputs(monkeypatch):
+    adapter, calls = api_embedder(
+        monkeypatch,
+        {
+            "data": [
+                {"index": 1, "embedding": [0, 4]},
+                {"index": 0, "embedding": [3, 0]},
+            ]
+        },
+    )
+    assert adapter.embed_documents([" É  ", "B"]) == [[1, 0], [0, 1]]
+    assert calls[0] == (
+        "https://host/v1/embeddings",
+        "token",
+        {"model": "embed", "input": [" É  ", "B"]},
+        30,
+    )
+    assert adapter.dim == 2
+    assert adapter.backend == "openai_compatible"
+
+
+@pytest.mark.parametrize(
+    "instruction,expected", [("retrieve", "Instruct: retrieve\nQuery: Q"), ("", "Q")]
+)
+def test_api_embedding_query_instruction(monkeypatch, instruction, expected):
+    adapter, calls = api_embedder(
+        monkeypatch, {"data": [{"index": 0, "embedding": [3, 4]}]}, instruction
+    )
+    assert adapter.embed_documents([]) == []
+    assert calls == []
+    assert adapter.embed_query("Q") == pytest.approx([0.6, 0.8])
+    assert calls[0][2]["input"] == [expected]
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        None,
+        [],
+        [{"index": True, "embedding": [1]}],
+        [{"index": 1, "embedding": [1]}],
+        [{"embedding": [1]}],
+        [{"index": 0, "embedding": []}],
+        [{"index": 0, "embedding": [0, 0]}],
+        [{"index": 0, "embedding": [True]}],
+        [{"index": 0, "embedding": ["1"]}],
+        [{"index": 0, "embedding": [float("nan")]}],
+        [{"index": 0, "embedding": [float("inf")]}],
+    ],
+)
+def test_api_embedding_rejects_invalid_response_without_dimension_mutation(
+    monkeypatch, data
+):
+    adapter, _ = api_embedder(monkeypatch, {"data": data})
+    with pytest.raises(embedding_module.EmbeddingError) as caught:
+        adapter.embed_documents(["a"])
+    assert adapter.dim == 0
+    assert str(caught.value) == "embedding provider request failed"
+    assert caught.value.__context__ is None
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        [{"index": 0, "embedding": [1]}, {"index": 0, "embedding": [2]}],
+        [{"index": 0, "embedding": [1]}, {"index": 1, "embedding": [1, 2]}],
+        [{"index": 0, "embedding": [1]}],
+    ],
+)
+def test_api_embedding_validates_entire_batch(monkeypatch, data):
+    adapter, _ = api_embedder(monkeypatch, {"data": data})
+    with pytest.raises(embedding_module.EmbeddingError):
+        adapter.embed_documents(["a", "b"])
+    assert adapter.dim == 0
+
+
+@pytest.mark.parametrize("magnitude", [1e308, 1e-308])
+def test_api_embedding_stable_normalization_and_dimension_lock(monkeypatch, magnitude):
+    body = {"data": [{"index": 0, "embedding": [magnitude, magnitude]}]}
+    adapter, _ = api_embedder(monkeypatch, body)
+    assert adapter.embed_query("q") == pytest.approx([2**-0.5, 2**-0.5])
+    body["data"][0]["embedding"] = [1]
+    with pytest.raises(embedding_module.EmbeddingError):
+        adapter.embed_query("q")
+    assert adapter.dim == 2
+
+
+def test_api_embedding_sanitizes_transport_error(monkeypatch):
+    import traceback
+
+    adapter, _ = api_embedder(monkeypatch, {})
+
+    def fail(*args):
+        raise RuntimeError("sentinel-token https://private sentinel-body")
+
+    monkeypatch.setattr("docsqa.provider_http.post_json", fail)
+    with pytest.raises(embedding_module.EmbeddingError) as caught:
+        adapter.embed_query("q")
+    assert caught.value.__context__ is None
+    assert "sentinel" not in "".join(traceback.format_exception(caught.value))

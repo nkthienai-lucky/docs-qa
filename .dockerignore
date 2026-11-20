@@ -1,0 +1,14 @@
+.env*
+.git
+.venv
+.superpowers
+.claude
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pdf
+*.PDF
+data
+eval
+tests
+docs

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from sentence_transformers import CrossEncoder
-
 from .store import Hit
 
 _DEFAULT_MODEL = "BAAI/bge-reranker-v2-m3"
@@ -52,7 +50,9 @@ class Reranker:
         self.batch_size = _validated_batch_size(
             batch_size if batch_size is not None else default_batch_size
         )
-        self.model: CrossEncoder = CrossEncoder(model, device=self.device)
+        from sentence_transformers import CrossEncoder
+
+        self.model = CrossEncoder(model, device=self.device)
 
     def rerank(self, query: str, hits: list[Hit], top_k: int) -> list[Hit]:
         if top_k <= 0 or not hits:

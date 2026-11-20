@@ -1,133 +1,146 @@
 # Runtime API Provider Design
 
 Date: 2026-11-19
-Status: Draft for approval
+Status: Scope approved in conversation after pre-implementation audit; revised implementation details below are builder decisions pending plan review.
 
-## Intent
+## Intent and approved scope
 
-Make the Docs-QA runtime deployable on Render without Ollama by replacing the runtime-only Ollama dependency with configurable OpenAI-compatible HTTP adapters for both generation and embeddings. The application must not enter a partially configured public deployment where generation works but embeddings do not, or where an old Ollama-built index is silently reused with a different embedding model.
+Prepare Docs-QA's FastAPI infrastructure for Render without Ollama inference. Cloud generation, embeddings and reranking use external APIs; V2a remains the default. The Gradio UI remains a separate local client. Local development retains independently selectable Ollama/API generation and embeddings and local/API reranking.
 
-The existing eval API judge configuration remains separate. Runtime provider credentials and endpoints must not reuse `API_JUDGE_*` settings, because eval judges may receive corpus excerpts under a different privacy policy.
+The user approved this scope after reviewing `docs/superpowers/plans/2026-11-19-runtime-api-provider-audit.md`. Approval does not authorize a public deployment, real provider calls, corpus egress, destructive reindexing, commits or new branches.
 
-## Goals
+## Approaches considered
 
-- Support runtime chat generation through a configurable OpenAI-compatible chat endpoint.
-- Support runtime document/query embeddings through a configurable OpenAI-compatible embeddings endpoint.
-- Support runtime reranking through a configurable external reranking API so cloud can retain the V2a retrieval contract.
-- Keep Ollama and API providers available for local development.
-- Define an explicit `local` profile where generation and embedding can independently use Ollama or OpenAI-compatible APIs, and reranking can use local CPU/CUDA or an API.
-- Define an explicit `cloud` profile where generation, embedding, and reranking must use external APIs; cloud startup must reject Ollama configuration or any incomplete API side.
-- Validate that generation and embedding configuration is complete before starting a Render deployment.
-- Reindex the corpus when the runtime embedding identity or vector dimension changes; never silently mix indexes.
-- Preserve the handwritten retrieval, citation, abstention, V1/V2a/V2b behavior, and eval-only API judge boundary.
-- Add Render-compatible startup behavior using `0.0.0.0` and the assigned `$PORT`, while retaining loopback-only local defaults.
-- Document required environment variables, provider capabilities, data-egress implications, and deployment steps.
+- **Three API adapters behind a runtime factory (selected):** retains the V2a pipeline in cloud and allows mixed local development; requires independent provider configuration and index safety.
+- **Hosted chat/embeddings with a local cross-encoder:** retains local model startup and resource requirements in cloud; does not satisfy approved API-only inference.
+- **Hosted chat/embeddings without reranking:** simpler, but silently replacing V2a with `v2b_norerank` violates the approved retrieval contract.
 
-## Non-goals
+## Constraints
 
-- No provider-specific SDK integration beyond the OpenAI-compatible HTTP contract in this phase.
-- No automatic account creation, API-key provisioning, or external API calls during implementation/tests.
-- No public deployment or corpus upload in this phase.
-- No claim that an arbitrary provider supports embeddings merely because it supports chat.
-- No reuse of the eval judge adapter as the runtime provider.
-- No change to held-out benchmark scores or rerun of the held-out evaluation.
-- No replacement of the local cross-encoder reranker with a hosted reranking API in this phase.
+- Preserve handwritten retrieval, query canonicalization, citations, abstention and all four retrieval configurations. Keep V2a default and existing `generation_k` behavior.
+- Runtime credentials/settings never fall back to `API_JUDGE_*`. Existing eval settings and held-out artifacts remain unchanged.
+- No external services in unit tests or ordinary smoke tests; use injected/mocked HTTP transport. Do not run held-out evaluation in this pass.
+- No real provider calls in this implementation session without separate explicit endpoint/privacy/cost approval. Credentials present in an environment are not approval.
+- No public deployment, production corpus upload or destructive reset in this pass. Deployment artifacts are preparation, not certification that public operation is safe.
+- No credentials, request/response bodies, document excerpts or provider URLs in errors, tracebacks or logs. Non-secret model identifiers may appear in identity metadata, not raw settings dumps.
+- Local serving defaults to `127.0.0.1:8000`; cloud defaults to `0.0.0.0` and requires a valid assigned `PORT`.
+- No provider SDKs; use stdlib HTTP and existing Python/FastAPI/Pydantic/pgvector stack.
 
-## Anti-goals and safety constraints
+## Current baseline
 
-- Do not log API keys, authorization headers, full provider URLs when they may contain credentials, or document excerpts sent to providers.
-- Do not start a public deployment unless both runtime generation and runtime embeddings are configured and their model/dimension identity is validated.
-- In `cloud` profile, do not allow either runtime side to resolve to Ollama, even if Ollama variables are present; fail closed instead.
-- Do not use an embedding API with an existing Ollama-built pgvector index without an explicit reindex.
-- Do not make `0.0.0.0` the local default.
-- Do not call external providers from unit tests or ordinary smoke tests.
+At `e51325d`, local Stage 3 tests pass (166 tests); API startup directly constructs Ollama generation/embedding and a local cross-encoder. `Embedder` is a protocol; generation/reranking are duck-typed. `index_meta` guards model/backend/dimension, but missing metadata can be inserted over existing chunks. UI is a loopback Gradio client configured through `DOCSQA_API_BASE`. Uploaded PDFs live under `data/uploads`.
 
-## Current state
+## Settings and profiles — builder decisions
 
-- `OllamaGenerator` calls Ollama `/api/chat` directly.
-- `OllamaEmbedder` calls Ollama `/api/embed` directly.
-- `api.serve()` constructs both Ollama classes directly.
-- `Embedder` is already a protocol, so an API embedder can implement the existing retrieval/store contract.
-- Generation currently has a concrete class rather than a shared protocol.
-- `Settings` has Ollama and eval-judge settings but no runtime provider settings.
-- The pgvector schema stores embedder model/backend/dimension in `index_meta` and rejects mismatches, which is the correct safety boundary to preserve.
-- The API currently binds to loopback and port 8000; Render requires `0.0.0.0` and its `$PORT`.
-- Uploads are stored under `data/uploads`, so production storage must be explicitly configured as a persistent disk or object storage in a later deployment step.
+Use enum `RuntimeProfile(local, cloud)` and explicit provider settings:
 
-## Chosen approach: OpenAI-compatible runtime adapters
+| Setting | Default / accepted values |
+|---|---|
+| `runtime_profile` | `local` / `cloud` |
+| `runtime_generation_provider` | `ollama` / `openai_compatible` |
+| `runtime_embedding_provider` | `ollama` / `openai_compatible` |
+| `runtime_rerank_provider` | `local` / `api` |
+| `runtime_chat_base_url`, `runtime_chat_token`, `runtime_chat_model` | unset |
+| `runtime_embedding_base_url`, `runtime_embedding_token`, `runtime_embedding_model` | unset |
+| `runtime_rerank_base_url`, `runtime_rerank_token`, `runtime_rerank_model` | unset |
+| `runtime_embedding_query_instruction` | `Given a web search query, retrieve relevant passages` |
+| `runtime_api_timeout_s` | 30; finite, greater than 0 and at most 120 |
+| `runtime_upload_dir` | `data/uploads` local; explicit absolute path required in cloud |
+| `runtime_deployment_approved` | false; explicit public-security gate, not automatic approval |
 
-Add provider-neutral runtime protocols/factories and two HTTP adapters:
+Use `SecretStr` for tokens and base URLs; reject blank tokens/models for selected API providers. Validate models as nonblank trimmed strings without control characters. Field errors contain field names and generic messages, never input values; hide Pydantic input values in rendered validation errors. Do not alter existing Ollama/eval settings or their defaults.
 
-1. `OpenAICompatibleGenerator`
-   - POST chat messages to `<chat_base_url>/chat/completions`.
-   - Send model, messages, deterministic temperature/options, and bounded output settings.
-   - Parse the standard `choices[0].message.content` response.
-   - Sanitize errors and raise the existing generator-facing error type without exposing credentials.
+`validate_runtime_profile(settings) -> None` validates all selected provider configuration before any provider construction or network request. Cloud requires all three explicit API provider selectors and complete credentials; reject local selectors. Merely having unused `OLLAMA_*` variables in the environment is harmless and must not construct Ollama. Cloud additionally requires HTTPS provider URLs and configured absolute upload path. Settings validation remains network-free. Public bind authorization is checked by the serving entrypoint, not inferred from valid provider settings.
 
-2. `OpenAICompatibleEmbedder`
-   - POST input texts to `<embedding_base_url>/embeddings`.
-   - Send model and input list.
-   - Parse `data[*].embedding`, preserve request order, normalize vectors using the existing canonical path, and discover/validate dimension.
-   - Expose a stable backend/model identity for `index_meta`.
+Task 1 defines profile validation and component protocols, not the component factory. Task 5 constructs adapters after Tasks 2–4 exist. Local CrossEncoder import/construction is lazy; cloud adapter construction must neither import nor load CrossEncoder. PDF parsing remains local Docling work and is explicitly outside API-only *inference* claims.
 
-3. `OpenAICompatibleReranker` or a provider-specific API adapter
-   - POST the query and candidate passages to a documented reranking endpoint.
-   - Parse ranked candidate indices/scores, preserve chunk identity, and validate that every returned item maps to an input candidate.
-   - Expose a stable provider/model/endpoint identity for deployment metadata.
-   - The cloud profile requires this adapter so V2a remains the cloud default; it must not silently downgrade to `v2b_norerank`.
+## Shared HTTP contract — builder decisions
 
+Add `provider_http.py` for endpoint normalization and bounded JSON POST. Adapters use separate endpoint credentials even if providers share a host.
 
-- deployment profile (`local` or `cloud`),
-- local generation provider (`ollama` or `openai_compatible`),
-- local embedding provider (`ollama` or `openai_compatible`),
-- cloud runtime chat base URL, token, and model (required),
-- cloud runtime embedding base URL, token, and model (required),
-- optional provider organization/project headers only if required and never logged,
-- public bind host and port with local-safe defaults.
+- Accept HTTP(S) absolute URLs with hostname; reject userinfo, query, fragment, whitespace/control characters and absent host. Cloud settings require HTTPS; HTTP is available for local development only.
+- A root URL becomes `/v1/<endpoint>`; a non-root custom prefix is preserved (`/gateway/v1` stays `/gateway/v1`). Strip trailing slashes and one recognized terminal suffix (`chat/completions`, `embeddings`, `rerank`) before appending the requested suffix. Do not duplicate `/v1`. Do not lowercase case-sensitive paths.
+- POST JSON with `Content-Type: application/json` and `Authorization: Bearer <token>`. Disable **all** redirects: no destination receives credentials through a redirect. No automatic retries or fallback providers in this pass.
+- Finite socket timeout from settings; read at most 8 MiB plus one byte and reject oversize responses before JSON parsing. This is a socket timeout, not a hard overall request deadline; document that limitation.
+- Reject malformed JSON, non-object envelopes, non-2xx statuses and non-standard NaN/Infinity JSON constants. Transport errors become fixed application errors. Never incorporate provider bodies, URLs or headers. Raise sanitized exceptions outside the caught-exception handler so neither `__context__` nor `__cause__` retains raw provider exceptions. Do not log provider exceptions.
+- Transport uses an injectable opener boundary for deterministic tests. Tests prove redirect rejection and captured output/tracebacks do not contain sentinel secrets, URLs or request text.
 
-The provider factory must enforce the profile contract: local may mix providers independently; cloud may use only API adapters for both runtime sides. A single provider may use the same base URL for both endpoints, but the configuration supports separate URLs and credentials so generation and embeddings can be hosted independently. The application startup factory must reject an incomplete API configuration before constructing the service.
+## Generation contract
 
-## Render deployment shape
+`OpenAICompatibleGenerator(host, model, token, timeout=30.0, max_tokens=256)` implements `generate(messages: list[dict[str, str]]) -> str`.
 
-- Add a production entrypoint or command that invokes the FastAPI app with `--host 0.0.0.0 --port $PORT`.
-- Keep local `api.serve()` defaults at `127.0.0.1:8000`.
-- Add Docker/Render configuration only after runtime provider factories and health checks are tested.
-- Render Postgres must provide pgvector. On first startup, schema creation must verify the extension and embedding metadata.
-- Uploaded PDFs must use a configured persistent storage location or object storage; ephemeral filesystem storage is not acceptable as the sole production copy.
-- The service must expose a lightweight health endpoint and a readiness path that can distinguish app process readiness from database/provider readiness without sending corpus data.
-- Production auth, rate limits, CORS policy, upload quotas, and provider cost controls are deployment gates, not optional polish.
+POST `/chat/completions` with model, messages, `temperature: 0`, `stream: false`, `max_tokens`. Require nonempty choices and a string `choices[0].message.content`; blank content is a malformed provider response. Return content without modifying citation markers. All API failures raise existing `GeneratorError` with fixed `generation provider request failed`. Keep Ollama behavior and error contract unchanged.
 
-## Tests and verification
+## Embedding contract
 
-- Unit tests for API generator request/response parsing, error sanitization, and missing configuration.
-- Unit tests for API embedder parsing, order preservation, normalization, dimension discovery, and error sanitization.
-- Factory tests proving local mode still creates Ollama adapters and API mode creates only API adapters.
-- Tests proving runtime settings never read `API_JUDGE_*` as a fallback.
-- Tests proving an embedder identity/dimension mismatch fails before use.
-- API startup tests for local loopback defaults and production host/port overrides.
-- No tests call external providers; use mocked HTTP transport at the adapter boundary.
-- Existing full suite, Ruff, diff check, and secret sweep must remain clean.
-- Before deployment, run a provider-specific integration smoke only with an explicitly approved API endpoint/key and a non-sensitive test string, then reindex the approved corpus and rerun the relevant evaluation separately.
+`OpenAICompatibleEmbedder(host, model, token, query_instruction, timeout=30.0)` implements existing `Embedder`, with `backend = "openai_compatible"`, `dim = 0` until successful discovery.
 
-## Rollout and rollback
+POST `/embeddings` with model and input list. `embed_documents([])` returns `[]` without HTTP. Embed documents as supplied: ingest/retrieval callers already own NFC/whitespace/accent canonicalization; do not add a circular import or change that boundary. `embed_query(q)` applies exactly `Instruct: {query_instruction}\nQuery: {q}` when instruction is nonempty; an explicitly empty instruction sends the query unchanged for models that do not use instructions.
 
-1. Implement adapters and settings behind explicit provider mode; keep Ollama defaults unchanged.
-2. Validate all tests and local smoke behavior without external calls.
-3. Configure a staging provider with a non-sensitive test corpus only after privacy/retention approval.
-4. Reindex the production corpus into a fresh database or after a deliberate index reset; do not mutate the old Ollama index in place without backup and approval.
-5. Deploy Render staging with API provider mode, Postgres/pgvector, persistent storage, and production host/port.
-6. Verify health, upload, retrieval, generation, citations, and error redaction.
-7. If any provider or storage check fails, roll back to local mode or stop deployment; do not fall back silently to a broken hybrid configuration.
+Require `data` to cover every requested index exactly once. Indices are integers, not booleans, in `[0, n)`. Restore request order. Vectors are nonempty, finite numeric (not boolean), same-dimension lists with nonzero norm; normalize using a numerically stable norm. Lock dimension only after validating the entire successful response and reject later dimension drift. Failed responses do not mutate `dim`. Raise fixed `EmbeddingError("embedding provider request failed")` without raw exception chains.
 
-## Open builder decisions
+## Reranking contract — one explicitly supported wire shape
 
-- Exact OpenAI-compatible endpoint/provider to use for production.
-- Whether the chosen provider offers both chat and embeddings, or whether two providers are needed.
-- Embedding model and vector dimension, which determine the reindex.
-- Whether CPU reranking latency is acceptable on Render or whether the initial demo uses `v2b_norerank`.
-- Persistent disk versus object storage for uploads.
-- Authentication and rate-limit policy for the public service.
+`ApiReranker(host, model, token, timeout=30.0)` implements `rerank(query: str, hits: list[Hit], top_k: int) -> list[Hit]`.
 
-## Approval requested
+Use a Cohere-style **v1 rerank JSON shape** at the configured root/custom prefix, not a claim of compatibility with every provider:
 
-Approve this design to proceed to the implementation plan. The implementation will not deploy publicly or call an external provider; it will first add tested, configurable adapters and Render readiness locally.
+```json
+{"model":"configured-model","query":"question","documents":["passage A","passage B"],"top_n":2}
+```
+
+```json
+{"results":[{"index":1,"relevance_score":0.9},{"index":0,"relevance_score":0.2}]}
+```
+
+Request all candidates (`top_n = len(hits)`), then select locally. Require exactly one result per input candidate, unique in-range non-boolean integer indices and finite non-boolean numeric `relevance_score`. Do not require a particular score range. Sort descending by score, ties by original candidate index; preserve original Chunk objects and replace only Hit scores. Empty hits or `top_k <= 0` returns `[]` without HTTP; clamp large top_k to available candidates. Reject incomplete top-N responses under this full-list contract. Raise fixed `RerankerError("reranking provider request failed")` without raw exception chains. Production provider must be verified against this contract before deployment.
+
+## Index identity and legacy policy — builder decisions
+
+Add optional `identity: str | None = None` to `EmbedderMeta` for compatibility with existing callers and eval. Runtime always supplies a versioned identity:
+
+`runtime-v1:` + SHA-256 of canonical JSON (sorted keys, compact separators) containing provider, canonical embedding endpoint (or normalized Ollama origin + `/api/embed`), model, discovered dimension, query instruction, and preprocessing version `canonical-text-v1`.
+
+Only the hash and prefix are persisted as identity; never store a raw API endpoint. Reject credentials/query/fragment in URLs before hashing. `runtime_index_identity(settings, embedder) -> str` is called only after a successful non-sensitive dimension probe. Runtime requires `1 <= dim <= 2000` for the existing `vector` HNSW index; this is an index capability limit, not an embedding API limit.
+
+- **Existing legacy callers without identity:** retain current model/backend/dim checks against legacy metadata; they cannot open a runtime-identified index with unknown identity.
+- **Runtime over populated legacy metadata, missing metadata, mismatched identity, or incompatible schema:** fail closed with generic rebuild-required diagnostics before inserting metadata, altering schema or modifying chunks.
+- **Unchanged populated local legacy indexes also require explicit migration/rebuild for new runtime startup.** No automatic backfill: old metadata cannot prove preprocessing/endpoint identity. Legacy eval callers remain compatible with old indexes.
+- **Empty existing legacy index:** reject with explicit fresh-index instruction rather than implicitly adopting it; a genuinely fresh schema can create runtime metadata/DDL atomically.
+- Keep missing-metadata stale-chunk guard for all callers, including legacy callers. Check table presence and populated chunks before inserting any metadata. Guard concurrent initialization with a transaction-scoped advisory lock and atomic DDL/metadata creation. Close/rollback on failure.
+
+No reset command is executed in this pass. Document separate fresh database/reindex steps, backups and approval before deletion. Use only `docsqa_test` for DB integration verification; mock ordering/no-mutation tests must also run without Postgres.
+
+## Runtime composition and API lifecycle
+
+Define `Generator` and `RuntimeReranker` protocols plus `RuntimeComponents(generator, embedder, reranker)`. `build_runtime_components(settings)` validates first, then creates selected adapters; it does not probe providers or open a DB. Local factory loads CrossEncoder only if local reranking was selected.
+
+`build_runtime_app(settings) -> FastAPI` builds the actual stack, probes embeddings with `"runtime dimension probe"`, enforces index identity, constructs all four existing retrievers and creates Pipeline with unchanged generation/final-k semantics. Failures close any created store and emit sanitized startup diagnostics, not a raw DB URL or provider traceback. API request provider failures return a generic 502 with no upstream detail. App shutdown closes its store. Keep `create_app(pipeline, store, data_dir)` dependency-injection usage working for existing tests/UI.
+
+## Serving, readiness, storage and cloud boundary
+
+- `docsqa.serve:create_runtime_app()` is an ASGI factory; `docsqa.serve:main()` is the production CLI. Keep `api.serve()` as a backwards-compatible wrapper. Add a direct Uvicorn dependency and console script `docsqa-api`.
+- `resolve_bind(settings, environ)` returns local default `127.0.0.1:8000` or cloud default `0.0.0.0:<PORT>`. Validate integer PORT in `[1,65535]`. Local HOST overrides are restricted to loopback. Cloud startup refuses to bind unless `runtime_deployment_approved` is explicitly true; Render template leaves it false.
+- `/health`: process liveness only, returns 200 `{"status":"ok"}` and does no network work.
+- `/ready`: no provider HTTP requests. Return sanitized state for config, initialized/identity-validated index, and bounded database `SELECT 1`; 200 if all pass, 503 otherwise. Label provider state `configured`, **not** live/healthy. Use DB connection timeout 3s and server statement timeout 2s on runtime DB connections. Provider startup proof is embedding-only; generator/reranker live availability remains unverified until separately approved smoke. Authentication errors and provider outages during requests do not silently downgrade retrieval.
+- Before dimension probing/DB work, validate upload path: local may use `data/uploads`; cloud requires explicit existing absolute writable directory. Verify writeability with a temporary sentinel and cleanup. Reject cloud symlink paths/ancestors to avoid misleading mount resolution; existence/writeability do not prove persistence.
+- First deployment template uses a single-instance persistent disk mounted at `/var/data` and uploads `/var/data/uploads`; create upload subdirectory in the container startup script under the mounted parent before app startup. Object storage and multi-instance shared uploads are follow-ups. Document disk/DB backup and restore pairing.
+- Docker excludes `.env*`, `.git`, `.venv`, eval artifacts, local uploads and user PDFs; retain only a sanitized example if needed. No build-time provider secrets or model downloads. Keep existing Docling/ML dependencies initially; this is not a lightweight image claim. Local PDF parsing may need model assets/network and substantial CPU/RAM; asset provisioning/resource smoke is a separate pre-deployment gate.
+- Render preparation is API-only. UI remains loopback and points at the API through `DOCSQA_API_BASE`. No hosted UI claim.
+- Before public deployment: approved auth, rate limits, CORS policy, quotas, provider budget/data-retention terms, pgvector availability, persistent mount/backups and parser assets/resources. The boolean deployment gate is an operator acknowledgement, **not an implementation** of these controls.
+
+## Verification and rollout
+
+1. RED → GREEN tests for settings, transport, each adapter, factory, index guard, API lifecycle and deployment gates. No external calls. Keep 166-test baseline regressions green; preserve eval import isolation.
+2. Full pytest, Ruff including new scripts, diff check and tracked-source secret sweep. Docker/Render artifacts get static tests; report container build/platform validation separately if not actually executed.
+3. Provide `scripts/runtime_api_smoke.py`: requires `--allow-network`, complete cloud settings read from process environment only (`_env_file=None`), and prior explicit approval. Without flag return a generic skipped message and make zero HTTP calls; with flag but invalid settings exit nonzero before construction. Use synthetic generation/embedding/rerank inputs only, fixed pass/fail counters, no provider diagnostics. Flag is a technical interlock, not evidence of privacy approval. Do not run the network-enabled path in this pass.
+4. Later, after approval, verify selected provider wire contracts, provision a fresh index and approved corpus, and validate ingestion/QA separately. Never rerun held-out here.
+5. Only after public security/infrastructure gates are met, stage API deployment and verify health/readiness/citations. On failure stop or roll back; never silently select Ollama or disable reranking in cloud.
+
+## Outstanding operator decisions
+
+Production endpoints/models/dimensions, provider retention/cost approval, production auth/rate-limit policy, persistent disk capacity/backups, pgvector service compatibility, parser assets and Render resource sizing remain deployment gates. They do not prevent implementing the explicitly documented mocked contracts above.
+
+## Approval boundary
+
+The three-provider/V2a/API-only scope was approved. Rerank wire shape, bounded transport, strict legacy-index rebuild policy, identity encoding and deployment interlock are explicit builder decisions introduced by this revision and are highlighted for plan review before implementation.

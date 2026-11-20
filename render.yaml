@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: docsqa-api
+    runtime: docker
+    numInstances: 1
+    plan: standard
+    healthCheckPath: /ready
+    disk:
+      name: docsqa-uploads
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - key: RUNTIME_PROFILE
+        value: cloud
+      - key: RUNTIME_DEPLOYMENT_APPROVED
+        value: "false"
+      - key: RUNTIME_GENERATION_PROVIDER
+        value: openai_compatible
+      - key: RUNTIME_EMBEDDING_PROVIDER
+        value: openai_compatible
+      - key: RUNTIME_RERANK_PROVIDER
+        value: api
+      - key: RUNTIME_UPLOAD_DIR
+        value: /var/data/uploads
+      - key: DATABASE_URL
+        sync: false
+      - key: RUNTIME_CHAT_BASE_URL
+        sync: false
+      - key: RUNTIME_CHAT_TOKEN
+        sync: false
+      - key: RUNTIME_CHAT_MODEL
+        sync: false
+      - key: RUNTIME_EMBEDDING_BASE_URL
+        sync: false
+      - key: RUNTIME_EMBEDDING_TOKEN
+        sync: false
+      - key: RUNTIME_EMBEDDING_MODEL
+        sync: false
+      - key: RUNTIME_RERANK_BASE_URL
+        sync: false
+      - key: RUNTIME_RERANK_TOKEN
+        sync: false
+      - key: RUNTIME_RERANK_MODEL
+        sync: false
