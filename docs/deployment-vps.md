@@ -14,6 +14,51 @@ Render template is an optional legacy alternative, not the active deployment.
 - This is private staging, not a certified public production service. Application
   auth/rate limits and remaining DB concurrency/recovery review are still open.
 
+## Footprint experiments (2026-11-20)
+
+These are isolated packaging spikes, not deployed replacements. No parser,
+embedding identity or evaluation baseline was changed.
+
+| Variant | Measured footprint | Verification | Limitation |
+| --- | --- | --- | --- |
+| Current CPU deployment image | Docker reports 3.23 GB; virtualenv 1,929 MiB | Offline Torch/Docling/API/UI imports | Includes unnecessary UI/evaluation/local-reranker dependencies |
+| API-only experiment | Docker reports 346 MB (includes uv and Python, excludes mounted application source) | Offline API import and creation of all 9 routes | No PDF parser; not a working upload deployment |
+| Docling retained, UI/eval/local-reranker removed | Virtualenv 1,392 MiB; final image not built/measured | Offline Docling import and creation of all 9 routes | Still carries Torch/OpenCV; parsing quality, memory and model assets not exercised |
+
+The current virtualenv's largest directories include Torch 714 MiB, Gradio
+185 MiB, PyArrow 163 MiB and combined OpenCV directories about 152 MiB.
+Directory byte totals and Docker image reporting use different accounting;
+do not subtract them to claim a final image size or filesystem reclamation.
+
+The retained-parser spike exported frozen requirements with `uv export --prune`
+for `gradio`, `ragas`, `sentence-transformers`, `langchain-community` and `pytest`.
+It retained Docling/Transformers, removed CUDA/NVIDIA/Triton packages and installed
+matching CPU Torch as in the existing Dockerfile. The API-only spike additionally
+pruned Docling and Transformers. Both need **explicit python-multipart==0.0.33**
+from the existing lock: uploads currently receive it transitively via Gradio.
+Simply pruning Gradio without adding multipart makes route creation fail.
+Do not promote the experimental requirement files without declaring production
+extras/dependency groups and verifying them against the lock.
+
+Recommended order:
+
+1. Package an API+Docling extra separately from UI/eval/local inference. Preserve
+   current parsing behavior; build and measure the actual image before switching.
+2. For substantial savings, assess API-only serving with separately operated
+   Docling ingestion, or an explicitly selected native-text parser. The former
+   needs an authenticated ingestion protocol; the latter changes extraction and
+   requires page/citation/quality regression tests, explicit index provenance and
+   a scan/OCR policy. Neither is implemented by these spikes.
+3. Do not rewrite this established Python evaluation project merely to reduce
+   image size. Future repositories default to Rust, but model/parser assets must
+   still be accounted for independently.
+
+No runtime RSS, peak build disk, parser model cache size, PDF parse latency or
+end-to-end provider availability was measured in this experiment. Root storage
+is the bottleneck (about 3 GB free during the experiments); avoid additional full
+image builds there without capacity checks. Experimental files are local to the
+VPS under `/data/docsqa/experiments`; they contain no provider credentials.
+
 ## Files and storage
 
 Deployment directory: `/data/docsqa/app`. Private environment:
