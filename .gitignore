@@ -27,3 +27,7 @@ logs/
 results/raw/
 *.sqlite3
 .worktrees/
+
+# Local-only agent planning and scratch artifacts
+.superpowers/
+docs/superpowers/
