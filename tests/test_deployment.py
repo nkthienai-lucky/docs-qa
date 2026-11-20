@@ -119,7 +119,7 @@ def test_packaging_contract():
     assert any(d.startswith("uvicorn") for d in project["dependencies"])
     assert project["scripts"]["docsqa-api"] == "docsqa.serve:main"
     docker = (ROOT / "Dockerfile").read_text()
-    assert "uv sync --frozen" in docker and "scripts/container_start.sh" in docker
+    assert "uv export --frozen" in docker and "scripts/container_start.sh" in docker
     assert "ARG " not in docker and "ollama pull" not in docker
     ignored = (ROOT / ".dockerignore").read_text()
     for pattern in [".env*", ".git", ".venv", "*.pdf", "data", "eval"]:
@@ -164,3 +164,24 @@ def test_startup_script_cloud_without_mount_refuses_before_api():
     )
     assert result.returncode != 0
     assert result.stderr.strip() == "persistent upload mount required"
+
+
+def test_container_cpu_image_contract():
+    docker = (ROOT / "Dockerfile").read_text()
+    assert "--torch-backend cpu" in docker
+    assert "COPY --from=dependencies /app/.venv" in docker
+    assert "USER docsqa" in docker
+
+
+def test_vps_compose_is_private_and_opt_in():
+    import yaml
+
+    config = yaml.safe_load((ROOT / "compose.vps.yaml").read_text())
+    api = config["services"]["api"]
+    db = config["services"]["db"]
+    assert api["ports"] == ["127.0.0.1:8001:8000"]
+    assert api["profiles"] == ["runtime"]
+    assert api["environment"]["RUNTIME_DEPLOYMENT_APPROVED"] == "${RUNTIME_DEPLOYMENT_APPROVED:-false}"
+    assert api["environment"]["RUNTIME_UPLOAD_DIR"] == "/var/data/uploads"
+    assert "ports" not in db
+    assert api["depends_on"]["db"]["condition"] == "service_healthy"

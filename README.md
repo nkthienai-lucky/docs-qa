@@ -8,7 +8,7 @@ A local, handwritten document-question-answering project with page-aware citatio
 - Runtime/API/UI default retrieval is **V2a (dense candidates + cross-encoder reranking)**, predeclared from dev tuning with the primary judge before held-out execution. Explicit `config="v1"`, `v2b`, or `v2b_norerank` remains supported for comparison and compatibility.
 - The final evaluation report is [eval/protocol-v2/report-final-rerun-gpu-api/](eval/protocol-v2/report-final-rerun-gpu-api/). It is a full rerun after an interrupted held-out attempt, not a pristine first-pass held-out run; this limitation is recorded in the report and ledger.
 - Stage 3 verification: full GPU rerun 80/80 results, API judge 72/72 in-scope samples, `166 passed`, Ruff clean, and `git diff --check` clean.
-- Runtime API/Render preparation is available below; public deployment is not authorized or validated. Local services remain bound to `127.0.0.1`.
+- Runtime deployment now targets the VPS with Docker Compose: see [VPS operations](docs/deployment-vps.md). The CPU image is built and the private database is healthy; API startup awaits runtime provider configuration. No public production deployment is claimed.
 
 ## Architecture
 
@@ -64,10 +64,12 @@ Current limitations include a single baseline document, a single locally authore
 - The API judge must never be imported from the web app; the package has an import-hygiene test.
 - Keep PostgreSQL and Ollama bound to loopback. Do not upload arbitrary user documents to an external judge.
 
-## Runtime API providers and Render preparation
+## Runtime API providers and VPS deployment
 
-Runtime infrastructure is **not deployment authorization**. Render artifacts are
-prepared but no public deployment or real-provider smoke is certified. V2a still
+The selected deployment target is the **VPS**, using `compose.vps.yaml`; see
+[setup, rollout status, private access and recovery](docs/deployment-vps.md).
+Runtime infrastructure is **not deployment authorization**. The Render template
+is retained as an alternative; no public deployment or real-provider smoke is certified. V2a still
 means dense retrieval plus reranking (external reranking in cloud); all four
 retrieval modes and top-1 generation context remain available. UI remains local:
 `DOCSQA_API_BASE` points the loopback Gradio client at the separately approved API.

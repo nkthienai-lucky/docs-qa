@@ -1,0 +1,54 @@
+name: docsqa
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: docsqa
+      POSTGRES_USER: docsqa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in private .env.vps}
+    volumes:
+      - /data/docsqa/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U docsqa -d docsqa']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+  api:
+    image: docsqa-vps:cpu
+    profiles: [runtime]
+    restart: unless-stopped
+    init: true
+    env_file: [.env.vps]
+    environment:
+      RUNTIME_PROFILE: cloud
+      RUNTIME_GENERATION_PROVIDER: openai_compatible
+      RUNTIME_EMBEDDING_PROVIDER: openai_compatible
+      RUNTIME_RERANK_PROVIDER: api
+      RUNTIME_DEPLOYMENT_APPROVED: ${RUNTIME_DEPLOYMENT_APPROVED:-false}
+      RUNTIME_UPLOAD_DIR: /var/data/uploads
+      PORT: '8000'
+      HF_HOME: /home/docsqa/.cache/huggingface
+    ports: ['127.0.0.1:8001:8000']
+    volumes:
+      - /data/docsqa/uploads:/var/data
+      - /data/docsqa/model-cache:/home/docsqa/.cache
+    depends_on:
+      db: {condition: service_healthy}
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    mem_limit: 4g
+    cpus: 2
+    pids_limit: 256
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/ready", timeout=5)']
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
