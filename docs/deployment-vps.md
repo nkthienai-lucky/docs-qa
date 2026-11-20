@@ -14,6 +14,27 @@ Render template is an optional legacy alternative, not the active deployment.
 - This is private staging, not a certified public production service. Application
   auth/rate limits and remaining DB concurrency/recovery review are still open.
 
+## ProxyLLM gateway probe (2026-11-20)
+
+Checked `https://api.proxyllm.eu/v1` against the public API. `/v1/models`
+lists `claude-sonnet-5-5` and `claude-opus-5-5` among chat models, but the
+pricing/model page describes `claude-sonnet-5-5` as an **alias backed by
+GPT 6 Luna**, so the model ID alone does not prove Anthropic Sonnet inference.
+The API reference documents `POST /v1/chat/completions` with Bearer auth only.
+Direct unauthenticated POST probes returned 404 for both `/v1/embeddings` and
+`/v1/rerank`; no Cohere-style rerank or OpenAI-compatible embedding endpoint is
+documented. Therefore this gateway **cannot cover all three runtime roles** as
+the current application requires. A minimal chat request with the supplied test
+key returned HTTP 401 Unauthorized; the key may have expired or been revoked,
+and it must be treated as compromised because it was shared in chat. No corpus
+text was sent to the gateway.
+
+Consequence: ProxyLLM can be considered only for chat/generation (after a valid
+key is configured privately and the model's true identity/data terms are
+accepted). Embedding still requires a separate vector endpoint and rerank a
+separate full-list endpoint, or adapter changes plus explicit quality/cost
+evaluation. See `README.md` for the three-provider requirement.
+
 ## Footprint experiments (2026-11-20)
 
 These are isolated packaging spikes, not deployed replacements. No parser,
